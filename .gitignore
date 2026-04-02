@@ -1,0 +1,7 @@
+# IDE
+.idea/
+
+# Cloned repos — directories are named after the plural of the repo type
+# Add a new line here whenever a new type is introduced
+domains/*/
+tools/*/
