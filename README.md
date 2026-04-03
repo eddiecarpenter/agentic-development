@@ -24,20 +24,24 @@ Before running the bootstrap you will need:
 cd ~/Development/my-projects   # or wherever you keep your repos
 ```
 
-Then download the bootstrap script, verify its integrity, and run it:
+Then download and run the bootstrap script:
 
 ```bash
 gh api repos/eddiecarpenter/agentic-development/contents/bootstrap.sh \
   --jq '.content' | base64 -d > /tmp/bootstrap.sh \
-  && gh api repos/eddiecarpenter/agentic-development/contents/bootstrap.sh.md5 \
-  --jq '.content' | base64 -d > /tmp/bootstrap.sh.md5 \
-  && (cd /tmp && md5sum -c bootstrap.sh.md5) \
   && bash /tmp/bootstrap.sh
 ```
 
 > **Tip:** Inspect the script before running it:
 > ```bash
 > gh api repos/eddiecarpenter/agentic-development/contents/bootstrap.sh --jq '.content' | base64 -d | less
+> ```
+
+> **Optional — verify script integrity before running:**
+> ```bash
+> gh api repos/eddiecarpenter/agentic-development/contents/bootstrap.sh.md5 \
+>   --jq '.content' | base64 -d > /tmp/bootstrap.sh.md5 \
+>   && (cd /tmp && md5sum -c bootstrap.sh.md5)
 > ```
 
 > **Note:** There will be a short pause after the agent launches while it fetches
