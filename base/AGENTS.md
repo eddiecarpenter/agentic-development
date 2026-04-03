@@ -91,6 +91,7 @@ package main
 func main() {}
 EOF
 ```
+Run `go mod init` — do not create `go.mod` by hand. The command writes the correct installed Go version automatically.
 
 **Java / Quarkus or Spring Boot:** create `src/main/java/` and `pom.xml` scaffold.
 **TypeScript / Node.js:** create `src/` and `package.json` scaffold.
