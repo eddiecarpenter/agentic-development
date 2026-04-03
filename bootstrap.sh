@@ -7,6 +7,10 @@
 
 set -euo pipefail
 
+# When piped via curl | bash, stdin is the pipe not the terminal.
+# Redirect stdin to the terminal so interactive prompts work correctly.
+exec < /dev/tty
+
 TEMPLATE_REPO="eddiecarpenter/agentic-development"
 TEMPLATE_RAW="https://raw.githubusercontent.com/${TEMPLATE_REPO}/main"
 WORKING_DIR="$(pwd)"
@@ -71,7 +75,7 @@ if command -v goose &>/dev/null && command -v claude &>/dev/null; then
   echo "Both Goose and Claude Code are installed."
   echo "  [1] Goose"
   echo "  [2] Claude Code"
-  read -rp "Which agent would you like to use? [1/2]: " agent_choice </dev/tty
+  read -rp "Which agent would you like to use? [1/2]: " agent_choice
   case "$agent_choice" in
     1) AGENT="goose" ;;
     2) AGENT="claude" ;;
@@ -89,7 +93,7 @@ echo -e "  Template repo : ${CYAN}${TEMPLATE_REPO}${NC}"
 echo -e "  Agent         : ${CYAN}${AGENT}${NC}"
 echo -e "  Working dir   : ${CYAN}${WORKING_DIR}${NC}"
 echo ""
-read -rp "Proceed? [y/N]: " confirm </dev/tty
+read -rp "Proceed? [y/N]: " confirm
 [[ "$confirm" =~ ^[Yy]$ ]] || { warn "Aborted."; exit 0; }
 
 # ── Launch bootstrap session ───────────────────────────────────────────────────
