@@ -3,9 +3,11 @@
 # Fetched from: https://github.com/eddiecarpenter/agentic-development
 #
 # Usage (verify then run):
-#   curl -fsSL https://raw.githubusercontent.com/eddiecarpenter/agentic-development/main/bootstrap.sh -o /tmp/bootstrap.sh \
-#     && curl -fsSL https://raw.githubusercontent.com/eddiecarpenter/agentic-development/main/bootstrap.sh.md5 -o /tmp/bootstrap.sh.md5 \
-#     && md5sum -c /tmp/bootstrap.sh.md5 \
+#   gh api repos/eddiecarpenter/agentic-development/contents/bootstrap.sh \
+#     --jq '.content' | base64 -d > /tmp/bootstrap.sh \
+#     && gh api repos/eddiecarpenter/agentic-development/contents/bootstrap.sh.md5 \
+#     --jq '.content' | base64 -d > /tmp/bootstrap.sh.md5 \
+#     && (cd /tmp && md5sum -c bootstrap.sh.md5) \
 #     && bash /tmp/bootstrap.sh
 
 set -euo pipefail

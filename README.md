@@ -31,7 +31,7 @@ gh api repos/eddiecarpenter/agentic-development/contents/bootstrap.sh \
   --jq '.content' | base64 -d > /tmp/bootstrap.sh \
   && gh api repos/eddiecarpenter/agentic-development/contents/bootstrap.sh.md5 \
   --jq '.content' | base64 -d > /tmp/bootstrap.sh.md5 \
-  && md5sum -c /tmp/bootstrap.sh.md5 \
+  && (cd /tmp && md5sum -c bootstrap.sh.md5) \
   && bash /tmp/bootstrap.sh
 ```
 
