@@ -234,15 +234,11 @@ while true; do
       ;;
     4)
       echo ""
-      echo "  Antora documentation site?"
-      echo "    1. Yes — external consumers or non-technical stakeholders will use it"
-      echo "    2. No  — README is sufficient"
-      echo ""
-      read -rp "  Choice: " antora_choice
+      read -rp "  Antora documentation site? (Y = external consumers/non-technical stakeholders, N = README is sufficient) [Y/N]: " antora_choice
       case "$antora_choice" in
-        1) PROJ_ANTORA="Yes" ;;
-        2) PROJ_ANTORA="No" ;;
-        *) warn "Invalid choice." ;;
+        [Yy]) PROJ_ANTORA="Yes" ;;
+        [Nn]) PROJ_ANTORA="No" ;;
+        *) warn "Invalid choice. Enter Y or N." ;;
       esac
       ;;
     0)
