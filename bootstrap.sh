@@ -289,7 +289,7 @@ info "Launching bootstrap agent — executing Steps 3-7..."
 info "This may take a moment..."
 echo ""
 
-BOOTSTRAP_PROMPT="Execute Phase 0a Environment Bootstrap Steps 3-7 as defined in base/AGENTS.md at ${TEMPLATE_RAW}/base/AGENTS.md.
+BOOTSTRAP_PROMPT="Execute Phase 0a Environment Bootstrap Steps 3-9 as defined in base/AGENTS.md at ${TEMPLATE_RAW}/base/AGENTS.md.
 
 All project details have been confirmed by the human. Do not ask for confirmation of these values.
 

@@ -49,25 +49,63 @@ are collected by `bootstrap.sh` before the agent is invoked. The agent receives 
 confirmed values and executes steps 3-7 only. Do not ask the human for any information
 that has already been provided — proceed directly to repo creation.
 
-#### Step 3 — Create the Agentic Repo
+#### Step 3 — Create the Repo
 
 ```bash
-gh repo create <org-or-user>/<project-name>-agentic \
+gh repo create <owner>/<repo-name> \
   --template eddiecarpenter/agentic-development \
   --private
 ```
 
-For embedded projects, the repo name is just `<project-name>` (no `-agentic` suffix).
+Repo naming:
+- Embedded: `<project-name>` — no suffix, this is the project repo
+- Organisation: `<project-name>-agentic` — control plane repo
 
-Clone the new repo locally and confirm the structure is correct before proceeding.
+Clone into the working directory provided by bootstrap.sh:
+```bash
+git clone git@github.com:<owner>/<repo-name>.git <working-dir>/<repo-name>
+```
 
-#### Step 4 — Configure the Repo
+#### Step 4 — Clean Up Template Files
 
-Apply standard configuration to the new repo:
+The template includes files that belong only in the template itself.
+Remove them from the newly cloned repo:
+
+```bash
+cd <working-dir>/<repo-name>
+git rm bootstrap.sh bootstrap.sh.md5
+git commit -m "chore: remove template bootstrap files"
+```
+
+#### Step 5 — Scaffold Project Structure
+
+Create the initial project structure based on the stack provided.
+
+**Go:**
+```bash
+go mod init github.com/<owner>/<repo-name>
+mkdir -p cmd/<repo-name> internal
+cat > cmd/<repo-name>/main.go << 'EOF'
+package main
+
+func main() {}
+EOF
+```
+
+**Java / Quarkus or Spring Boot:** create `src/main/java/` and `pom.xml` scaffold.
+**TypeScript / Node.js:** create `src/` and `package.json` scaffold.
+**Python:** create `src/` and `pyproject.toml` scaffold.
+**Rust:** run `cargo init`.
+
+Commit: `chore: scaffold <stack> project structure`
+
+#### Step 6 — Configure the Repo
+
+Apply standard configuration:
 
 **Branch protection on `main`:**
 ```bash
-gh api repos/<org>/<repo>/branches/main/protection \
+gh api repos/<owner>/<repo>/branches/main/protection \
   --method PUT \
   --field required_pull_request_reviews=null \
   --field enforce_admins=false \
@@ -79,31 +117,46 @@ gh api repos/<org>/<repo>/branches/main/protection \
 `requirement`, `feature`, `task`, `backlog`, `draft`, `in-design`,
 `in-development`, `in-review`, `done`
 
-**Secrets** — if PAT is needed for workflows:
-- Organisation project: guide human to add PAT as an org secret in GitHub Settings
-- Embedded project: guide human to add PAT as a repo secret
-
-#### Step 5 — Create the GitHub Project
-
 ```bash
-gh project create --owner <org-or-user> --title "<Project Name>"
+for label in requirement feature task backlog draft in-design in-development in-review done; do
+  gh label create "$label" --repo <owner>/<repo> --force
+done
 ```
 
-For organisation projects, link all repos to the project as they are created.
+**Secrets** — if PAT is needed for workflows:
+- Organisation: guide human to add PAT as an org secret in GitHub Settings
+- Embedded: guide human to add PAT as a repo secret
 
-#### Step 6 — Populate the Agentic Repo
+#### Step 7 — Populate the Repo
 
-In the newly cloned repo:
-1. Update `REPOS.md` with the project description and first repo entry (if not embedded)
-2. Update `AGENTS.local.md` with any project-specific overrides
-3. If Antora — scaffold the `docs/` AsciiDoc module structure and `antora-playbook.yml`
-4. Commit: `chore: bootstrap <project-name> agentic environment`
+In the cloned repo:
+1. Update `REPOS.md` with the project description
+2. Update `AGENTS.local.md` with the template source and any project-specific notes:
+   ```
+   ## Template Source
+   Template: eddiecarpenter/agentic-development
+   ```
+3. Update `README.md` with the project name and description
+4. If Antora — scaffold `docs/` AsciiDoc module structure and `antora-playbook.yml`
+5. Commit: `chore: bootstrap <project-name>`
+6. Push: `git push origin main`
 
-#### Step 7 — Hand Off
+#### Step 8 — Create the GitHub Project
 
-- Confirm the agentic repo URL and GitHub Project URL to the human
-- Proceed to Repo Inception Session (Phase 0b) if the first domain or tool repo
-  needs to be created, otherwise hand off to Requirements Session (Phase 1)
+```bash
+gh project create --owner <owner> --title "<project-name>"
+```
+
+#### Step 9 — Hand Off
+
+Confirm to the human:
+- Agentic repo URL
+- GitHub Project URL
+- Local clone path
+
+For organisation topology: offer to proceed to Repo Inception Session (Phase 0b)
+to register the first domain or tool repo.
+For embedded topology: offer to proceed to Requirements Session (Phase 1).
 
 ---
 
