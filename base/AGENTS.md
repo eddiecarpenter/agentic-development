@@ -94,23 +94,29 @@ Ask the human:
 
 #### Step 2 — Project Questions
 
-Ask each question individually. Wait for the human's answer before asking the next.
-Do not present multiple questions at once. Do not guess or assume any answer.
-Do not proceed to the next question until the current one is explicitly answered.
+Use a form-based interaction. Display all fields and their current values at once.
+The human enters a number to set a field, then 0 when done.
 
-**Question 1 — Project name**
-Ask: "What is the project name?"
-Wait for answer. Confirm: "Project name: <answer> — correct? [y/N]"
-If no — ask again.
+Display the form like this:
 
-**Question 2 — Project description**
-Ask: "Briefly describe the project in one or two sentences."
-Wait for answer. Confirm: "Description: <answer> — correct? [y/N]"
-If no — ask again.
+```
+Project Setup
+─────────────────────────────────────────────────────
+1. Name        : (not set)
+2. Description : (not set)
+3. Stack       : (not set)
+4. Antora site : (not set)
+─────────────────────────────────────────────────────
+Enter a number to set a field, or 0 when done.
+```
 
-**Question 3 — Primary stack**
-Ask: "What is the primary stack?"
-Present as numbered options:
+**When the human enters a field number:**
+- Ask only for that field's value
+- For fields with fixed options (Stack, Antora) present numbered sub-options
+- Update the displayed value and redisplay the full form
+- Return to the form prompt
+
+**Stack options (when field 3 is selected):**
   1. Go
   2. Java / Quarkus
   3. Java / Spring Boot
@@ -118,15 +124,17 @@ Present as numbered options:
   5. Python
   6. Rust
   7. Other (specify)
-Wait for the human to enter a number. If 7 — ask them to specify.
-Confirm the selection before proceeding.
 
-**Question 4 — Antora documentation site**
-Ask: "Do you need an Antora documentation site?"
-Present as numbered options:
+**Antora options (when field 4 is selected):**
   1. Yes — external consumers or non-technical stakeholders will use it
   2. No — README is sufficient
-Wait for the human to enter a number. Confirm before proceeding.
+
+**When the human enters 0:**
+- If any field is still `(not set)` — warn which fields are missing and redisplay the form
+- If all fields are set — confirm the values and proceed to Step 3
+
+Never guess or assume a field value. Never pre-fill a field without explicit human input.
+Always redisplay the full form after each field is set.
 
 #### Step 3 — Create the Agentic Repo
 

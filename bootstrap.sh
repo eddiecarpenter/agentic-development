@@ -122,11 +122,12 @@ Then follow the steps exactly:
 8. Confirm the new agentic repo URL to the human
 
 IMPORTANT INTERACTION RULES:
-- Ask ONE question at a time. Wait for the human to answer before asking the next.
-- Never present multiple questions together.
-- Never guess or assume an answer — always wait for explicit input.
+- Use a form-based interaction for collecting project details (Step 2).
+- Display all fields with current values, human enters a number to set a field, 0 when done.
+- Redisplay the full form after each field is updated.
+- If human enters 0 with unset fields — warn and redisplay the form.
+- Never guess or assume a field value. Never pre-fill without explicit human input.
 - Always present choices as numbered options so the human responds with a number.
-- After each answer, confirm it before proceeding to the next question.
 - Do not ask for permission to run gh commands — bootstrap has full authorisation to use gh."
 
 case "$AGENT" in
