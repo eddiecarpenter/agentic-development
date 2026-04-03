@@ -44,97 +44,10 @@ Run interactively by a human. Creates a brand new agentic environment from scrat
 This session is run once per project. The output is a fully configured agentic repo
 ready for Phase 1.
 
-#### Pre-flight Checks
-
-Before doing anything else, verify:
-- `gh` is authenticated: `gh auth status`
-- A PAT has been created with sufficient scopes (repo, workflow, admin:org if org-based)
-- The `agentic-development` template repo is accessible
-
-If any check fails, tell the human exactly what is needed and wait for confirmation
-before proceeding.
-
-#### Step 1 — Topology
-
-Always present choices as numbered options so the human can respond with a number.
-
-Ask the human:
-> *Is this an embedded project (single repo) or an organisation project (multi-repo)?*
-> *1. Embedded — agentic repo and project repo are the same*
-> *2. Organisation — separate agentic control plane repo, multiple repos*
-
-**If organisation:**
-1. Fetch all orgs the human has access to:
-   `gh org list`
-2. For each org, check whether it has existing repos:
-   `gh repo list <org> --limit 1`
-3. Present the list with clean/dirty status:
-   ```
-   Available organisations:
-     [1] NewOpenBSS     ← clean (no repos)
-     [2] OldProject     ← has existing repos
-
-   Select an organisation, or enter 0 to create a new one:
-   ```
-4. If human selects a **dirty org** — warn:
-   > *"This organisation already contains repositories. Bootstrap is designed for a
-   > clean organisation. Are you sure you want to proceed, or did you mean a different
-   > organisation?"*
-   - Confirmed → exit with instructions to follow the brownfield onboarding process manually
-   - Wrong org → return to step 1
-5. If human selects **0 (create new)** — instruct:
-   > *"Please create the organisation in GitHub, then press Enter to continue."*
-   Re-fetch the org list and return to step 3.
-6. If human selects a **clean org** — proceed to Step 2.
-
-**If embedded:**
-1. Ask whether the repo will live under a personal account or an existing org
-2. If org — fetch org list and let human pick (no clean/dirty check needed — the repo
-   is new, not the org)
-
-#### Step 2 — Project Questions
-
-Use a form-based interaction. Display all fields and their current values at once.
-The human enters a number to set a field, then 0 when done.
-
-Display the form like this:
-
-```
-Project Setup
-─────────────────────────────────────────────────────
-1. Name        : (not set)
-2. Description : (not set)
-3. Stack       : (not set)
-4. Antora site : (not set)
-─────────────────────────────────────────────────────
-Enter a number to set a field, or 0 when done.
-```
-
-**When the human enters a field number:**
-- Ask only for that field's value
-- For fields with fixed options (Stack, Antora) present numbered sub-options
-- Update the displayed value and redisplay the full form
-- Return to the form prompt
-
-**Stack options (when field 3 is selected):**
-  1. Go
-  2. Java / Quarkus
-  3. Java / Spring Boot
-  4. TypeScript / Node.js
-  5. Python
-  6. Rust
-  7. Other (specify)
-
-**Antora options (when field 4 is selected):**
-  1. Yes — external consumers or non-technical stakeholders will use it
-  2. No — README is sufficient
-
-**When the human enters 0:**
-- If any field is still `(not set)` — warn which fields are missing and redisplay the form
-- If all fields are set — confirm the values and proceed to Step 3
-
-Never guess or assume a field value. Never pre-fill a field without explicit human input.
-Always redisplay the full form after each field is set.
+All pre-flight checks, topology selection, owner/org selection, and project details
+are collected by `bootstrap.sh` before the agent is invoked. The agent receives all
+confirmed values and executes steps 3-7 only. Do not ask the human for any information
+that has already been provided — proceed directly to repo creation.
 
 #### Step 3 — Create the Agentic Repo
 
