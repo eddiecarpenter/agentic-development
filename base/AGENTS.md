@@ -166,6 +166,22 @@ One branch per Feature. Tasks are commits on that branch, not separate branches.
 
 ---
 
+## Base Directory — Read Only
+
+The `base/` directory is managed exclusively by the `agentic-development` template.
+**Never modify any file under `base/` directly** — not even minor edits.
+
+If a change to the global protocol or standards is needed:
+1. Clone `eddiecarpenter/agentic-development` locally
+2. Make and test the changes there
+3. Push and raise a PR for human review
+4. Once merged and tagged, sync `base/` into this repo using the sync process
+
+For project-specific overrides that cannot wait for a template sync, add them to
+`AGENTS.local.md` instead — that is what it is for.
+
+---
+
 ## Sensitive Operations — Ask Before Proceeding
 
 Always ask a human before:
