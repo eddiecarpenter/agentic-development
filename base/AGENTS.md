@@ -94,12 +94,39 @@ Ask the human:
 
 #### Step 2 — Project Questions
 
-Collect the following:
-- **Project name** — used for the agentic repo name and GitHub Project title
-- **Project description** — one or two sentences, goes into README and REPOS.md
-- **Primary stack** — drives which `base/standards/` file applies
-- **Antora documentation site?** — needed if external consumers or non-technical
-  stakeholders will depend on published contracts or architecture docs
+Ask each question individually. Wait for the human's answer before asking the next.
+Do not present multiple questions at once. Do not guess or assume any answer.
+Do not proceed to the next question until the current one is explicitly answered.
+
+**Question 1 — Project name**
+Ask: "What is the project name?"
+Wait for answer. Confirm: "Project name: <answer> — correct? [y/N]"
+If no — ask again.
+
+**Question 2 — Project description**
+Ask: "Briefly describe the project in one or two sentences."
+Wait for answer. Confirm: "Description: <answer> — correct? [y/N]"
+If no — ask again.
+
+**Question 3 — Primary stack**
+Ask: "What is the primary stack?"
+Present as numbered options:
+  1. Go
+  2. Java / Quarkus
+  3. Java / Spring Boot
+  4. TypeScript / Node.js
+  5. Python
+  6. Rust
+  7. Other (specify)
+Wait for the human to enter a number. If 7 — ask them to specify.
+Confirm the selection before proceeding.
+
+**Question 4 — Antora documentation site**
+Ask: "Do you need an Antora documentation site?"
+Present as numbered options:
+  1. Yes — external consumers or non-technical stakeholders will use it
+  2. No — README is sufficient
+Wait for the human to enter a number. Confirm before proceeding.
 
 #### Step 3 — Create the Agentic Repo
 

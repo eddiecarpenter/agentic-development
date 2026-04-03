@@ -121,11 +121,13 @@ Then follow the steps exactly:
 7. Populate REPOS.md and AGENTS.local.md — record template source as: ${TEMPLATE_REPO}
 8. Confirm the new agentic repo URL to the human
 
-Do not skip any step. Do not ask for permission to run gh commands — bootstrap has full authorisation to use gh.
-
-When presenting choices to the human, always use numbered options so the human can respond with a number, for example:
-  1. Embedded
-  2. Organisation"
+IMPORTANT INTERACTION RULES:
+- Ask ONE question at a time. Wait for the human to answer before asking the next.
+- Never present multiple questions together.
+- Never guess or assume an answer — always wait for explicit input.
+- Always present choices as numbered options so the human responds with a number.
+- After each answer, confirm it before proceeding to the next question.
+- Do not ask for permission to run gh commands — bootstrap has full authorisation to use gh."
 
 case "$AGENT" in
   goose)
