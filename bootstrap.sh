@@ -3,13 +3,10 @@
 # Fetched from: https://github.com/eddiecarpenter/agentic-development
 #
 # Usage (verify then run):
-#   curl -fsSL https://raw.githubusercontent.com/eddiecarpenter/agentic-development/main/bootstrap.sh | bash
+#   curl -fsSL https://raw.githubusercontent.com/eddiecarpenter/agentic-development/main/bootstrap.sh -o /tmp/bootstrap.sh \
+#     && bash /tmp/bootstrap.sh
 
 set -euo pipefail
-
-# When piped via curl | bash, stdin is the pipe not the terminal.
-# Redirect stdin to the terminal so interactive prompts work correctly.
-exec < /dev/tty
 
 TEMPLATE_REPO="eddiecarpenter/agentic-development"
 TEMPLATE_RAW="https://raw.githubusercontent.com/${TEMPLATE_REPO}/main"

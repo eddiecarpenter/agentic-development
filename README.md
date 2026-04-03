@@ -27,7 +27,8 @@ cd ~/Development/my-projects   # or wherever you keep your repos
 Then download and run the bootstrap script:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/eddiecarpenter/agentic-development/main/bootstrap.sh | bash
+curl -fsSL https://raw.githubusercontent.com/eddiecarpenter/agentic-development/main/bootstrap.sh -o /tmp/bootstrap.sh \
+  && bash /tmp/bootstrap.sh
 ```
 
 > **Tip:** Inspect the script before running it:
