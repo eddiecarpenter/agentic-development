@@ -71,7 +71,7 @@ if command -v goose &>/dev/null && command -v claude &>/dev/null; then
   echo "Both Goose and Claude Code are installed."
   echo "  [1] Goose"
   echo "  [2] Claude Code"
-  read -rp "Which agent would you like to use? [1/2]: " agent_choice
+  read -rp "Which agent would you like to use? [1/2]: " agent_choice </dev/tty
   case "$agent_choice" in
     1) AGENT="goose" ;;
     2) AGENT="claude" ;;
@@ -89,7 +89,7 @@ echo -e "  Template repo : ${CYAN}${TEMPLATE_REPO}${NC}"
 echo -e "  Agent         : ${CYAN}${AGENT}${NC}"
 echo -e "  Working dir   : ${CYAN}${WORKING_DIR}${NC}"
 echo ""
-read -rp "Proceed? [y/N]: " confirm
+read -rp "Proceed? [y/N]: " confirm </dev/tty
 [[ "$confirm" =~ ^[Yy]$ ]] || { warn "Aborted."; exit 0; }
 
 # ── Launch bootstrap session ───────────────────────────────────────────────────
