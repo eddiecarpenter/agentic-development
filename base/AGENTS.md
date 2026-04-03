@@ -38,6 +38,197 @@ There is no STATUS.md. Current state is derived from GitHub Issues.
 
 ## Session Types
 
+### Environment Bootstrap Session (Phase 0a)
+
+Run interactively by a human. Creates a brand new agentic environment from scratch.
+This session is run once per project. The output is a fully configured agentic repo
+ready for Phase 1.
+
+#### Pre-flight Checks
+
+Before doing anything else, verify:
+- `gh` is authenticated: `gh auth status`
+- A PAT has been created with sufficient scopes (repo, workflow, admin:org if org-based)
+- The `agentic-development` template repo is accessible
+
+If any check fails, tell the human exactly what is needed and wait for confirmation
+before proceeding.
+
+#### Step 1 — Topology
+
+Ask the human:
+> *Is this an embedded project (single repo) or an organisation project (multi-repo)?*
+
+**If organisation:**
+1. Fetch all orgs the human has access to:
+   `gh org list`
+2. For each org, check whether it has existing repos:
+   `gh repo list <org> --limit 1`
+3. Present the list with clean/dirty status:
+   ```
+   Available organisations:
+     [1] NewOpenBSS     ← clean (no repos)
+     [2] OldProject     ← has existing repos
+
+   Select an organisation, or enter 0 to create a new one:
+   ```
+4. If human selects a **dirty org** — warn:
+   > *"This organisation already contains repositories. Bootstrap is designed for a
+   > clean organisation. Are you sure you want to proceed, or did you mean a different
+   > organisation?"*
+   - Confirmed → exit with instructions to follow the brownfield onboarding process manually
+   - Wrong org → return to step 1
+5. If human selects **0 (create new)** — instruct:
+   > *"Please create the organisation in GitHub, then press Enter to continue."*
+   Re-fetch the org list and return to step 3.
+6. If human selects a **clean org** — proceed to Step 2.
+
+**If embedded:**
+1. Ask whether the repo will live under a personal account or an existing org
+2. If org — fetch org list and let human pick (no clean/dirty check needed — the repo
+   is new, not the org)
+
+#### Step 2 — Project Questions
+
+Collect the following:
+- **Project name** — used for the agentic repo name and GitHub Project title
+- **Project description** — one or two sentences, goes into README and REPOS.md
+- **Primary stack** — drives which `base/standards/` file applies
+- **Antora documentation site?** — needed if external consumers or non-technical
+  stakeholders will depend on published contracts or architecture docs
+
+#### Step 3 — Create the Agentic Repo
+
+```bash
+gh repo create <org-or-user>/<project-name>-agentic \
+  --template eddiecarpenter/agentic-development \
+  --private
+```
+
+For embedded projects, the repo name is just `<project-name>` (no `-agentic` suffix).
+
+Clone the new repo locally and confirm the structure is correct before proceeding.
+
+#### Step 4 — Configure the Repo
+
+Apply standard configuration to the new repo:
+
+**Branch protection on `main`:**
+```bash
+gh api repos/<org>/<repo>/branches/main/protection \
+  --method PUT \
+  --field required_pull_request_reviews=null \
+  --field enforce_admins=false \
+  --field restrictions=null \
+  --field required_status_checks=null
+```
+
+**Standard labels** — create if not present:
+`requirement`, `feature`, `task`, `backlog`, `draft`, `in-design`,
+`in-development`, `in-review`, `done`
+
+**Secrets** — if PAT is needed for workflows:
+- Organisation project: guide human to add PAT as an org secret in GitHub Settings
+- Embedded project: guide human to add PAT as a repo secret
+
+#### Step 5 — Create the GitHub Project
+
+```bash
+gh project create --owner <org-or-user> --title "<Project Name>"
+```
+
+For organisation projects, link all repos to the project as they are created.
+
+#### Step 6 — Populate the Agentic Repo
+
+In the newly cloned repo:
+1. Update `REPOS.md` with the project description and first repo entry (if not embedded)
+2. Update `AGENTS.local.md` with any project-specific overrides
+3. If Antora — scaffold the `docs/` AsciiDoc module structure and `antora-playbook.yml`
+4. Commit: `chore: bootstrap <project-name> agentic environment`
+
+#### Step 7 — Hand Off
+
+- Confirm the agentic repo URL and GitHub Project URL to the human
+- Proceed to Repo Inception Session (Phase 0b) if the first domain or tool repo
+  needs to be created, otherwise hand off to Requirements Session (Phase 1)
+
+---
+
+### Repo Inception Session (Phase 0b)
+
+Run interactively by a human. Adds a new repo (domain, tool, or other type) to an
+existing agentic environment. No code is written — the output is a bootstrapped repo
+registered in `REPOS.md` and ready for Phase 1.
+
+#### Step 1 — Read Context
+
+Follow Session Initialisation. Confirm the agentic environment is healthy before
+proceeding.
+
+#### Step 2 — Repo Questions
+
+Collect the following:
+- **Repo type** — domain, tool, or other (determines local clone directory `<type>s/`)
+- **Repo name** — follows convention `<name>-<type>` for domains (e.g. `charging-domain`)
+  or just `<name>` for tools (e.g. `ocs-testbench`)
+- **Description** — one or two sentences, goes into REPOS.md
+- **Stack** — drives which `base/standards/` file applies
+
+#### Step 3 — Scoping Conversation
+
+Have a methodology-agnostic scoping conversation with the human to establish:
+- What problem does this repo solve?
+- What are its boundaries — what is in scope, what is explicitly out of scope?
+- How does it relate to other repos in the environment?
+- What are the key interfaces or contracts with other systems?
+
+The output of this conversation is captured as the repo's `docs/PROJECT_BRIEF.md`.
+
+#### Step 4 — Create the GitHub Repo
+
+```bash
+gh repo create <org>/<repo-name> --private
+```
+
+Apply standard configuration:
+- Branch protection on `main` (same as Phase 0a Step 4)
+- Standard labels
+- Link to the org GitHub Project
+
+#### Step 5 — Bootstrap the Repo Structure
+
+Initialise the repo with:
+- `CLAUDE.md` — referencing the agentic repo's `base/AGENTS.md`
+- `AGENTS.local.md` — placeholder for local overrides
+- `docs/PROJECT_BRIEF.md` — output of the scoping conversation (Step 3)
+- `README.md` — operational detail (how to run, setup, environment config)
+- `.github/workflows/` — thin caller workflows referencing the agentic template
+
+Commit: `chore: bootstrap <repo-name>`
+
+#### Step 6 — Register in REPOS.md
+
+Add the new repo entry to `REPOS.md` in the agentic repo:
+```
+## <repo-name>
+
+- **Repo:** git@github.com:<org>/<repo-name>.git
+- **Stack:** <stack>
+- **Type:** <type>
+- **Status:** active
+- **Description:** <description>
+```
+
+Commit and raise a PR to the agentic repo: `chore: register <repo-name> in REPOS.md`
+
+#### Step 7 — Hand Off
+
+- Confirm the repo URL to the human
+- Proceed to Requirements Session (Phase 1)
+
+---
+
 ### Requirements Session (Phase 1)
 
 Run interactively by a human. Captures business needs as Requirement issues
