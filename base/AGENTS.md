@@ -279,10 +279,16 @@ in the relevant domain repo(s). No branch, no commit, no PR.
 1. Read context (see Session Initialisation)
 2. Read the target Requirement issue in full
 3. Converse with the human to scope the Feature(s)
-4. Create Feature issue(s) in the domain repo with `feature` + `backlog` label
-5. Wire sub-issue relationship: Feature → parent Requirement (cross-repo)
-6. Add Feature to org Project, set Domain field
-7. When human confirms ready: apply `in-design` label → triggers Feature Design Session
+4. Identify whether the Feature has UI/UX impact:
+   - Not every requirement has a UI impact
+   - A single requirement may produce multiple features, some with UI impact and some without
+   - For any feature with UI impact: design the UX now — ASCII mockups, flow descriptions,
+     field layout, error states, colour/theming decisions — and include it in the feature issue
+   - Do not leave UX decisions to the Feature Design Session or implementation
+5. Create Feature issue(s) in the domain repo with `feature` + `backlog` label
+6. Wire sub-issue relationship: Feature → parent Requirement
+7. Add Feature to org Project
+8. When human confirms ready: apply `in-design` label → triggers Feature Design Session
 
 ### Feature Design Session (Phase 3)
 
