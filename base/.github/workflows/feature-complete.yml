@@ -9,7 +9,7 @@ on:
 jobs:
   feature-complete:
     name: Mark Feature Done
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     # Only run when a feature branch PR is merged (not just closed)
     if: |
       github.event.pull_request.merged == true &&
