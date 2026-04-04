@@ -46,11 +46,10 @@ Open Goose and select the **Feature Scoping (Stage 2)** recipe.
 
 ## Notification
 
-After applying `in-design`, fire a macOS desktop notification so the human knows automation has taken over and they can step away:
+After applying `in-design`, notify the system owner that automation has taken over and no action is needed yet.
+Use the **Notify User** skill (`base/skills/notify-user.md`) with the message:
 
-```bash
-osascript -e 'display notification "Feature sent to design — automation running, no action needed yet" with title "Agentic Pipeline" sound name "Glass"'
-```
+> "Feature #N sent to design — automation running, no action needed yet"
 
 ## Next Step
 

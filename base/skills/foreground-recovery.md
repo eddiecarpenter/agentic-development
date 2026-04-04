@@ -38,11 +38,10 @@ Open Goose and select the **Foreground Recovery** recipe.
 
 ## Notification
 
-After pushing the fix, fire a macOS desktop notification so the human can confirm the workflow restarted:
+After pushing the fix, notify the system owner to confirm the workflow has restarted.
+Use the **Notify User** skill (`base/skills/notify-user.md`) with the message:
 
-```bash
-osascript -e 'display notification "Fix pushed — check that the Dev Session workflow has restarted" with title "Agentic Pipeline" sound name "Glass"'
-```
+> "Fix pushed for Feature #N — please confirm the Dev Session workflow has restarted"
 
 ## Next Step
 

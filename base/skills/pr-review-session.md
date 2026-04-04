@@ -29,11 +29,10 @@ Triggered automatically by GitHub Actions when a PR review is submitted with
 
 ## Notification
 
-Before exiting, fire a macOS desktop notification so the human knows the PR has been updated:
+Before exiting, notify the system owner that the PR has been updated and needs re-review.
+Use the **Notify User** skill (`base/skills/notify-user.md`) with the message:
 
-```bash
-osascript -e 'display notification "PR updated — please re-review and merge if approved" with title "Agentic Pipeline" sound name "Glass"'
-```
+> "PR #N has been updated — please re-review and merge if approved"
 
 ## Next Step
 

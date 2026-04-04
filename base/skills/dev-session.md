@@ -32,11 +32,10 @@ Triggered automatically by GitHub Actions when a Feature issue is labelled `in-d
 
 ## Notification
 
-Before exiting, fire a macOS desktop notification so the human knows the PR is ready:
+Before exiting, notify the system owner that the PR is ready for review.
+Use the **Notify User** skill (`base/skills/notify-user.md`) with the message:
 
-```bash
-osascript -e 'display notification "PR ready for review — please check GitHub" with title "Agentic Pipeline" sound name "Glass"'
-```
+> "PR #N is ready for your review — [repo]"
 
 ## Next Step
 
