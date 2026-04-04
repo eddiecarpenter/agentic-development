@@ -1,6 +1,11 @@
 # IDE
 .idea/
 
+# Goose session data — never commit
+.goose/config/
+.goose/data/
+.goose/state/
+
 # Cloned repos — directories are named after the plural of the repo type
 # Add a new line here whenever a new type is introduced
 domains/*/
