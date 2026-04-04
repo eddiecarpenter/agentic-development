@@ -22,7 +22,8 @@ jobs:
         run: |
           ISSUE=${{ github.event.issue.number }}
           BRANCH=$(gh api repos/${{ github.repository }}/branches \
-            --jq ".[] | .name | select(startswith(\"feature/${ISSUE}-\"))")
+            --jq ".[] | .name | select(startswith(\"feature/${ISSUE}-\"))" \
+            | head -1)
           if [ -z "$BRANCH" ]; then
             echo "No branch found matching feature/${ISSUE}-*"
             exit 1
