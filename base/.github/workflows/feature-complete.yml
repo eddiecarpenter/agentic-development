@@ -1,0 +1,45 @@
+name: Feature Complete (Stage 5)
+
+on:
+  pull_request:
+    types: [closed]
+    branches:
+      - main
+
+jobs:
+  feature-complete:
+    name: Mark Feature Done
+    runs-on: self-hosted
+    # Only run when a feature branch PR is merged (not just closed)
+    if: |
+      github.event.pull_request.merged == true &&
+      startsWith(github.event.pull_request.head.ref, 'feature/')
+    permissions:
+      contents: write
+      issues: write
+
+    steps:
+      - name: Extract feature issue number
+        id: feature
+        run: |
+          BRANCH="${{ github.event.pull_request.head.ref }}"
+          # Branch format: feature/<issue-number>-<description>
+          ISSUE_NUMBER=$(echo "${BRANCH}" | sed 's|feature/\([0-9]*\)-.*|\1|')
+          echo "issue_number=${ISSUE_NUMBER}" >> $GITHUB_OUTPUT
+
+      - name: Apply done label and close feature issue
+        env:
+          GH_TOKEN: ${{ secrets.GOOSE_AGENT_PAT }}
+        run: |
+          ISSUE="${{ steps.feature.outputs.issue_number }}"
+          if [ -z "${ISSUE}" ]; then
+            echo "Could not extract issue number from branch — skipping"
+            exit 0
+          fi
+          gh issue edit ${ISSUE} \
+            --repo ${{ github.repository }} \
+            --remove-label "in-review" \
+            --add-label "done"
+          gh issue close ${ISSUE} \
+            --repo ${{ github.repository }} \
+            --comment "Feature implemented and merged via PR #${{ github.event.pull_request.number }}."
