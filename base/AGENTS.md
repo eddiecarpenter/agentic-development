@@ -32,6 +32,8 @@ At the start of every session, read these sources in order before doing anything
 6. Load skills from `base/skills/` (template-managed, read-only) and `skills/`
    (local, project-specific, if the directory exists). Local skills in `skills/`
    take precedence over template skills in `base/skills/` of the same name.
+   Template-managed skills include `update-project-template` (extract live
+   project config into `base/project-template.json`).
 
 Do not skip any step. Do not begin work until all steps are complete.
 
