@@ -91,6 +91,12 @@ instructions: |
         }
       }'
 
+  **CRITICAL: Do NOT close task issues after creating them.**
+  Task issues must remain OPEN — the Dev Session reads open tasks and closes
+  them only after implementing and committing each one.
+  Closing a task here will cause the Dev Session to find nothing to do,
+  produce no code, and fail when attempting to open a PR with no commits.
+
   ## Step 5 — Create the Feature Branch
 
   Branch name: feature/<feature-issue-number>-<short-description>
@@ -123,6 +129,7 @@ instructions: |
   - Every task that adds logic must include a test task or test requirement
   - Do not begin implementation — design only
   - Exit cleanly — do not push files, do not open a PR
+  - **Never close task issues** — leave all task issues open for the Dev Session
 
 prompt: |
   Starting Feature Design session for feature #{{ feature_issue }} in {{ repo }}.
