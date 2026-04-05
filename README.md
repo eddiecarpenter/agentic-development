@@ -96,6 +96,22 @@ Requirements Session (Phase 1).
 
 ---
 
+## Releasing a new version
+
+When you are ready to publish a new version of the template:
+
+```bash
+gh release create vX.Y.Z --generate-notes --target main
+```
+
+GitHub will automatically generate release notes from all merged PRs since the last tag.
+Use [semantic versioning](https://semver.org): `fix:` → patch, `feat:` → minor, breaking change → major.
+
+> There is no automated release workflow — releasing is a deliberate human action.
+> Not every merge needs a release; batch related changes into a meaningful version.
+
+---
+
 ## Syncing updates from the template
 
 Syncing is handled by the agent — do not do this manually.
