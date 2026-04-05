@@ -1,0 +1,13 @@
+{
+  "statusField": {
+    "options": [
+      { "name": "Backlog", "color": "GRAY", "description": "Prioritised, ready to start" },
+      { "name": "Scoping", "color": "PURPLE", "description": "Requirement or feature being scoped" },
+      { "name": "Scheduled", "color": "BLUE", "description": "Scoped and queued, waiting for design" },
+      { "name": "In Design", "color": "PINK", "description": "Feature Design session active" },
+      { "name": "In Development", "color": "YELLOW", "description": "Dev Session active" },
+      { "name": "In Review", "color": "ORANGE", "description": "PR open, awaiting review" },
+      { "name": "Done", "color": "GREEN", "description": "Merged and closed" }
+    ]
+  }
+}
