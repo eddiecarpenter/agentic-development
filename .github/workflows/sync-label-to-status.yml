@@ -93,8 +93,15 @@ jobs:
             '.data.node.projectItems.nodes[] | select(.project.id == $pid) | .id')
 
           if [ -z "${ITEM_ID}" ]; then
-            echo "Issue is not linked to project ${PROJECT_ID} — skipping"
-            exit 0
+            echo "Issue not in project — adding now"
+            ADD_RESULT=$(gh api graphql -f query='
+              mutation($projectId: ID!, $contentId: ID!) {
+                addProjectV2ItemById(input: {projectId: $projectId, contentId: $contentId}) {
+                  item { id }
+                }
+              }
+            ' -f projectId="${PROJECT_ID}" -f contentId="${ISSUE_NODE_ID}")
+            ITEM_ID=$(echo "${ADD_RESULT}" | jq -r '.data.addProjectV2ItemById.item.id')
           fi
 
           echo "item_id=${ITEM_ID}" >> $GITHUB_OUTPUT
