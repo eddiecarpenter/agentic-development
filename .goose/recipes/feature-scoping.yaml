@@ -52,6 +52,11 @@ instructions: |
   "Closes #N" or "Parent requirement: #N" in existing feature issue bodies).
   If a matching Feature already exists, tell the human and treat it as context.
 
+  Transition the requirement from backlog to scoping:
+    gh issue edit <number> --repo <owner>/<agentic-repo> \
+      --remove-label "backlog" \
+      --add-label "scoping"
+
   ## The Seven Artefacts (work through these in order)
 
   ### Artefact 1 — Raw Idea
@@ -158,6 +163,12 @@ instructions: |
       --add-label "in-design"
 
   Confirm to the human: "Feature #N created and queued for design."
+
+  After all features have been created and sent to design, transition the parent
+  requirement from scoping to scheduled:
+    gh issue edit <requirement-number> --repo <owner>/<agentic-repo> \
+      --remove-label "scoping" \
+      --add-label "scheduled"
 
   ## Ending the Session
 

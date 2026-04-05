@@ -42,6 +42,8 @@ jobs:
           LABEL="${{ github.event.label.name }}"
           case "${LABEL}" in
             backlog)          STATUS="Backlog" ;;
+            scoping)          STATUS="Scoping" ;;
+            scheduled)        STATUS="Scheduled" ;;
             in-design)        STATUS="In Design" ;;
             in-development)   STATUS="In Development" ;;
             in-review)        STATUS="In Review" ;;

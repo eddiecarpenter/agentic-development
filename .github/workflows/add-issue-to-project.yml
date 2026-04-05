@@ -83,6 +83,8 @@ jobs:
           for LABEL in $(echo "${LABELS}" | jq -r '.[]'); do
             case "${LABEL}" in
               backlog)          STATUS="Backlog"; break ;;
+              scoping)          STATUS="Scoping"; break ;;
+              scheduled)        STATUS="Scheduled"; break ;;
               in-design)        STATUS="In Design"; break ;;
               in-development)   STATUS="In Development"; break ;;
               in-review)        STATUS="In Review"; break ;;
