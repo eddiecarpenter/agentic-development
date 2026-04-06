@@ -385,3 +385,152 @@ and the agent produced a formally structured, testable feature specification wit
 full traceability back to the original requirement.
 
 Next, the automated phases take over.
+
+---
+
+## 6 — Phases 3 & 4: Automated Design and Development
+
+This is where the framework earns its keep. After the `in-design` label is applied,
+**you do not need to do anything**. GitHub Actions triggers the agent automatically,
+and it designs, implements, tests, and opens a pull request — all without human
+intervention.
+
+But understanding what happens behind the scenes is essential. When something goes
+wrong (and eventually it will), you need to know where the process was and what to
+look for.
+
+### Phase 3 — Feature Design
+
+**Trigger:** The `in-design` label on the Feature issue triggers a GitHub Actions
+workflow that launches the agent with the **Feature Design** session.
+
+**What the agent does:**
+
+1. **Reads the Feature issue** — extracts the user story, acceptance criteria, and
+   any context from the scoping phase
+2. **Analyses the codebase** — understands what already exists (project structure,
+   existing code, standards) to determine what needs to be built
+3. **Creates Task sub-issues** — ordered by implementation sequence, each with:
+   - A specific piece of work to perform
+   - Files to create or change
+   - Acceptance criteria (testable conditions)
+   - A mapping back to which feature-level acceptance criterion it satisfies
+4. **Verifies coverage** — every acceptance criterion from the Feature issue must
+   be covered by at least one task. If a criterion has no task, the agent stops
+   and reports the gap
+5. **Creates the feature branch** — `feature/<N>-<description>` (e.g.
+   `feature/42-url-shortener`)
+6. **Applies `in-development`** — this triggers the next phase
+
+For the URL Shortener, the agent might create tasks like:
+
+- Task 1: Scaffold Go project structure
+- Task 2: Implement POST /shorten endpoint with in-memory store
+- Task 3: Implement GET /:code redirect endpoint
+- Task 4: Add 404 handling for unknown codes
+- Task 5: Add integration tests for all endpoints
+
+**Important:** The Design Session writes no code. It produces only the plan (task
+issues) and the branch. Implementation happens in the next phase.
+
+### Phase 4 — Development
+
+**Trigger:** The `in-development` label triggers a GitHub Actions workflow that
+launches the agent with the **Dev Session**.
+
+**What the agent does:**
+
+1. **Checks out the feature branch** — verifies it is not on `main`
+2. **Reads the Feature issue** — extracts acceptance criteria for end-of-session
+   verification
+3. **Queries open Task sub-issues** — ordered by issue number
+4. **For each task, in order:**
+   - Reads the task issue to understand what must be built
+   - Implements the code described in the task
+   - Writes tests — every piece of logic must have tests covering success cases,
+     failure cases, and edge cases
+   - Runs the full build and test suite
+   - **If the build or tests fail** — diagnoses and fixes the issue before moving on.
+     The agent never skips a failing test
+   - Commits: `feat: [task description] — task N of N (#feature-issue)`
+   - Closes the task issue
+5. **Verifies acceptance criteria coverage** — every acceptance criterion from the
+   Feature issue must have at least one passing test. If any criterion lacks coverage,
+   the agent stops and reports which criteria are uncovered
+6. **Exits cleanly** — the workflow pushes the branch and opens a PR with
+   `Closes #<feature-issue-number>`
+
+For the URL Shortener, the agent will:
+- Create the Go project structure
+- Implement each endpoint with an in-memory store
+- Write tests for every acceptance criterion
+- Run `go build`, `go vet`, and `go test` after each change
+- Open a PR when all tasks pass
+
+### Monitoring progress
+
+While the automated phases run, you can watch from your terminal or browser:
+
+```bash
+# List recent workflow runs
+gh run list --limit 5
+
+# Watch a specific run in real time
+gh run watch <run-id>
+
+# View the Actions tab in your browser
+gh repo view --web
+# Navigate to the Actions tab
+```
+
+You can also watch task issues close in real time — each closed task means the
+agent has successfully implemented, tested, and committed that piece of work.
+
+The entire process — from `in-design` being applied to a PR being opened — typically
+takes a few minutes, depending on the complexity of the feature and the speed of the
+LLM backend.
+
+### When things go wrong — Foreground Recovery
+
+The automated pipeline is robust, but it is not infallible. Builds can fail, tests
+can break, workflows can fail to trigger, and merge conflicts can arise. When any of
+these happen, the pipeline stops and the workflow turns red.
+
+**Foreground Recovery** is the escape hatch. It is not limited to build failures —
+it is the correct response to any blocked or unexpected state:
+
+- Build is red
+- Tests are failing
+- Merge conflict on the feature branch
+- Workflow never triggered (silent failure)
+- Any other situation requiring manual intervention
+
+**How to use it:**
+
+```
+goose session
+# Select: Foreground Recovery
+```
+
+The agent will:
+
+1. **Ask for the exact error output** — it never guesses the cause
+2. **Diagnose the root cause** from the error
+3. **Fix only what is failing** — it does not refactor or expand scope
+4. **Build and test** to confirm the fix works
+5. **Commit and push** the fix
+6. **Re-trigger the Dev Session** if needed (by re-applying the `in-development`
+   label)
+
+After the fix is pushed, the automated pipeline resumes where it left off. The
+agent picks up the remaining tasks and continues.
+
+> **Key principle:** Foreground Recovery fixes the immediate problem and gets the
+> pipeline moving again. It does not redesign or re-scope. If the failure reveals
+> a fundamental design issue, the agent will stop and raise it with you rather than
+> attempting a broad fix.
+
+For more detail on Foreground Recovery, see
+[`base/skills/foreground-recovery.md`](base/skills/foreground-recovery.md).
+
+Next, the PR is ready for your review.
