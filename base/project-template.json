@@ -13,8 +13,8 @@
     ]
   },
   "views": [
-    { "name": "Requirements", "layout": "TABLE_LAYOUT", "filter": "-status:Done" },
-    { "name": "Requirements Kanban", "layout": "BOARD_LAYOUT", "filter": "label:requirement -status:\"In Design\",\"In Development\",Done" },
-    { "name": "Features Kanban", "layout": "BOARD_LAYOUT", "filter": "label:feature -status:Scoping,Scheduled,Done" }
+    { "name": "Requirements", "layout": "TABLE_LAYOUT", "filter": "is:open" },
+    { "name": "Requirements Kanban", "layout": "BOARD_LAYOUT", "filter": "label:requirement -status:\"In Design\",\"In Development\" is:open" },
+    { "name": "Features Kanban", "layout": "BOARD_LAYOUT", "filter": "label:feature -status:Scoping,Scheduled is:open" }
   ]
 }
