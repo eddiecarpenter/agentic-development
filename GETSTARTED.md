@@ -530,3 +530,157 @@ Every artefact traces back to the one before it. This is the governance that
 makes agentic development trustworthy.
 
 ---
+
+## Stage 2 — Change request (Day-2 development)
+
+### Overview
+
+In Stage 1 you built a URL Shortener from scratch — a greenfield project where
+every file was new. In Stage 2 you will add a feature to that **existing**
+codebase. This is day-2 development: the agent must understand what already
+exists before it can design and implement something new.
+
+The key difference is not what you do — the phases are the same. The difference
+is **how the agent thinks**. During scoping it reads existing code. During
+design it creates tasks that extend existing files rather than creating new ones.
+During development it works within an established architecture rather than
+inventing one.
+
+This stage uses the same URL Shortener repo you built in Stage 1.
+
+---
+
+### Phase 1 — New requirement
+
+Open a Requirements Session just as you did in Stage 1:
+
+```
+goose session
+# Select: Requirements Session (Stage 1)
+```
+
+This time, describe a change to the existing URL Shortener. For example:
+
+> **You:** I want to add a hit counter to the URL shortener. Every time
+> someone visits a short URL, the visit count should be incremented. I want
+> an endpoint to retrieve the visit count for a given short code.
+>
+> **Agent:** So you want two new behaviours on top of the existing shortener:
+> 1. Track visit count — increment a counter each time GET /:code redirects
+> 2. A new endpoint to retrieve the count — something like GET /:code/stats
+>
+> Should the counter be persistent, or is in-memory acceptable? Any
+> authentication on the stats endpoint?
+>
+> **You:** In-memory is fine. No authentication — keep it simple.
+
+The agent creates a new Requirement issue, just as before. The process is
+identical.
+
+> **Verification checkpoint:** Run `gh issue list --label requirement` and
+> confirm the new requirement issue exists with the `backlog` label.
+
+---
+
+### Phase 2 — Scoping (agent reads existing code)
+
+This is where day-2 development diverges from greenfield. When the agent
+scopes this feature, it **reads the existing codebase first**.
+
+In Stage 1, the agent had nothing to work with — it designed everything from
+scratch. Now it has a working URL Shortener with handlers, a store, tests,
+and a project structure. The agent analyses all of this before proposing a
+feature scope.
+
+**What to observe during scoping:**
+
+- The agent examines the existing code to understand the current architecture
+- It identifies which files and packages need to change vs what is new
+- The acceptance criteria it writes account for the existing implementation
+  (e.g. "the existing redirect handler increments a counter" rather than
+  "create a redirect handler")
+- The feature scope is smaller because infrastructure already exists
+
+The agent creates a Feature issue and applies `in-design`, just as in Stage 1.
+
+> **Verification checkpoint:** Read the Feature issue. Notice how the
+> acceptance criteria reference existing behaviour — "when the existing
+> redirect endpoint is called" rather than "create a redirect endpoint".
+> The Project board should show the new feature in **In Design**.
+
+---
+
+### Phases 3 & 4 — Automated design and development
+
+The automated phases run exactly as they did in Stage 1 — the `in-design`
+label triggers design, and `in-development` triggers development. But the
+**content** of the tasks will be noticeably different.
+
+**What to observe during design (Phase 3):**
+
+- The agent reads the existing codebase before creating tasks
+- Tasks are shaped around what already exists: "add a counter field to the
+  existing store struct" rather than "create a store"
+- Fewer tasks overall — the scaffold, project structure, and base endpoints
+  already exist
+- Tasks reference existing files by name
+
+**What to observe during development (Phase 4):**
+
+- The agent modifies existing files rather than creating everything new
+- Tests extend the existing test suite rather than building from scratch
+- The agent reuses existing patterns (error handling, HTTP response formats,
+  store interface) rather than inventing new ones
+- Build and test commands are the same (`go build ./...`, `go test ./...`)
+
+Monitor progress the same way:
+
+```bash
+gh run list --limit 5
+gh issue list --label task --state open
+gh issue list --label task --state closed
+```
+
+> **Verification checkpoint:** When the PR is opened, review the diff. Notice
+> that the changes are **additive** — modifying and extending existing files,
+> not rewriting them. The commit history should show incremental changes
+> within the established architecture.
+
+---
+
+### Merge
+
+Review and merge the PR, just as in Stage 1:
+
+```bash
+gh pr list
+gh pr view <pr-number> --web
+# Review, then:
+gh pr merge <pr-number> --squash
+```
+
+> **Verification checkpoint:** After merging, pull `main` and confirm the
+> hit counter feature works alongside the original shortener. The Project
+> board should show both features in **Done**.
+
+---
+
+### What to notice — how day-2 differs from greenfield
+
+Take a moment to compare the two stages:
+
+| Aspect | Stage 1 (Greenfield) | Stage 2 (Day-2) |
+|---|---|---|
+| **Scoping** | Agent designs from scratch | Agent reads existing code first |
+| **Task count** | More tasks — everything is new | Fewer tasks — infrastructure exists |
+| **Task shape** | "Create X" | "Extend X", "Add Y to existing Z" |
+| **Files touched** | All new | Mix of modified and new |
+| **Tests** | New test suite | Extended test suite |
+| **Architecture** | Agent invents patterns | Agent follows existing patterns |
+
+The protocol is the same — phases, labels, automation. But the agent's
+**reasoning** adapts to what already exists. This is what makes the framework
+useful beyond the first feature: the agent is not a one-shot code generator,
+it is a participant that understands context.
+
+---
