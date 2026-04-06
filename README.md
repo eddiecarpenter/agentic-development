@@ -242,21 +242,6 @@ If it is a constraint that must always apply, it belongs in the rulebook (`AGENT
 for project-specific rules). If it is a procedure invoked for a specific task, it belongs
 in a skill.
 
-### Built-in skills
-
-| Skill | Purpose |
-|---|---|
-| `session-init` | Load the environment at session start or after a template sync |
-| `requirements-session` | Capture business needs as Requirement issues |
-| `feature-scoping` | Decompose a Requirement into Feature issues |
-| `feature-design` | Decompose a Feature into ordered Task sub-issues |
-| `dev-session` | Implement Task sub-issues to completion |
-| `pr-review-session` | Process review comments on a PR |
-| `issue-session` | Handle a bug or question assigned to the agent |
-| `foreground-recovery` | Emergency escape hatch for any blocked pipeline state |
-| `capture-feature` | Canonical structure for a Feature issue body |
-| `notify-user` | How and when the agent communicates status to the human |
-
 Skills live in two places:
 
 | Path | Managed by | Purpose |
