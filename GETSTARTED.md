@@ -534,3 +534,157 @@ For more detail on Foreground Recovery, see
 [`base/skills/foreground-recovery.md`](base/skills/foreground-recovery.md).
 
 Next, the PR is ready for your review.
+
+---
+
+## 7 — Phase 4b: PR Review
+
+When the Dev Session completes and the workflow pushes the branch, a pull request is
+opened automatically with `Closes #<feature-issue-number>` in the body. The
+`in-review` label is applied. This is where the human re-enters the process.
+
+### What to look for in the review
+
+Open the PR in your browser or from the terminal:
+
+```bash
+gh pr list
+gh pr view <pr-number> --web
+```
+
+Review the URL Shortener PR with these questions in mind:
+
+- **Does the code match the acceptance criteria?** Check that POST /shorten returns
+  a short code, GET /:code redirects, and unknown codes return 404
+- **Are there tests for every criterion?** The agent should have written tests for
+  success cases, failure cases, and edge cases
+- **Is the code clean and idiomatic?** The agent follows the standards in
+  `base/standards/`, but you should still check that the code reads well
+- **Does the commit history tell a story?** Each commit should correspond to one
+  task, in order — you can trace each commit back to a task issue
+
+### Leaving review comments
+
+When you find something to change, leave an inline comment on the relevant line.
+When you find something to ask about, leave a comment with your question.
+
+Submit your review as either:
+- **Request changes** — the agent will address all comments
+- **Comment** — the agent will respond to questions and fix issues
+
+### How review comments trigger the agent
+
+When you submit a review with `CHANGES_REQUESTED` or `COMMENTED`, a GitHub Actions
+workflow triggers the **PR Review Session** automatically. The agent:
+
+1. Fetches all unresolved inline comments from the PR
+2. Classifies each comment as a **question** or a **change request**
+3. **Questions** — the agent replies inline with an explanation, no code changes
+4. **Change requests** — the agent implements the fix, writes or updates tests,
+   builds, tests, commits, and replies to the comment
+5. Pushes the fixes — you see new commits appear on the PR
+
+You can then re-review the PR. This cycle continues until you are satisfied.
+
+### Approving the PR
+
+When you are happy with the code, approve the PR. The agent does not merge —
+that is always a human decision.
+
+---
+
+## 8 — Merge
+
+Merge the PR using the GitHub UI or the terminal:
+
+```bash
+gh pr merge <pr-number> --squash  # or --merge, depending on your preference
+```
+
+When the PR merges:
+
+- The Feature issue is closed automatically (the PR body contains `Closes #N`)
+- The feature branch is cleaned up
+- The parent Requirement issue transitions to `done` when all its child features
+  are closed
+
+**Congratulations** — you have just delivered a feature through the full AI-native
+delivery pipeline. From a plain-English description of a URL shortener to a
+reviewed, tested, merged pull request — with full traceability from requirement
+to code.
+
+Take a moment to look at what the pipeline produced:
+
+- A **Requirement issue** with a formal user story and acceptance criteria
+- A **Feature issue** with scoped acceptance criteria linked to the requirement
+- **Task sub-issues** that decomposed the feature into ordered, implementable work
+- A **feature branch** with one commit per task
+- **Tests** covering every acceptance criterion
+- A **pull request** reviewed by you and fixed by the agent
+
+Every artefact traces back to the one before it. This is the governance that makes
+agentic development trustworthy.
+
+---
+
+## 9 — What's Next
+
+Now that you have completed the walkthrough, here are concrete next steps to deepen
+your understanding and make the framework your own.
+
+### Run a second feature
+
+The best way to build confidence is repetition. Open a new Requirements Session and
+describe a second feature for the URL Shortener — perhaps analytics (track how many
+times each short URL is visited) or URL expiration. Watch the full pipeline run again,
+this time knowing what to expect at each phase.
+
+### Try the federated topology
+
+The walkthrough used the **Single Repo** topology — one repo for everything. For
+real-world projects with multiple services, the **Federated Topology** separates
+the agentic control plane from domain repos:
+
+```bash
+gh agentic inception
+```
+
+This adds a new domain or tool repo to your existing environment. Each domain repo
+has its own codebase, issues, and feature branches — while the agentic repo
+coordinates the pipeline. See the [Repository topology](README.md#repository-topology)
+section in the README for details.
+
+### Add local standards and rules
+
+Customise the framework for your project:
+
+- **`AGENTS.local.md`** — add project-specific rules that extend the global protocol.
+  Team conventions, prohibited actions, domain glossary, links to external systems.
+  These are always active — every agent session reads them.
+
+- **`skills/`** — add project-specific skills (named procedures). Your release
+  process, deployment checklist, incident runbook templates. A local skill with the
+  same filename as a base skill overrides it.
+
+See [Extending the framework](README.md#extending-the-framework) in the README.
+
+### Explore the framework in depth
+
+- **[README.md](README.md)** — full framework overview, pipeline diagram, topology
+  options, configuration model
+- **[`base/AGENTS.md`](base/AGENTS.md)** — the rulebook: git rules, testing
+  standards, contract safety, working principles
+- **[`base/skills/`](base/skills/)** — all built-in session playbooks: requirements,
+  scoping, design, development, PR review, foreground recovery
+- **[`base/standards/`](base/standards/)** — language-specific coding standards
+
+### Join the community
+
+This framework is open source and actively evolving. Your experience using it makes
+it better.
+
+- **[GitHub Discussions](https://github.com/eddiecarpenter/ai-native-delivery/discussions)**
+  — questions, ideas, and war stories
+- **[Open an issue](https://github.com/eddiecarpenter/ai-native-delivery/issues)**
+  — report gaps where the protocol fell short
+- **Contribute** — propose improvements to the protocol, standards, or skills
