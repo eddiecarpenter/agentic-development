@@ -6,7 +6,7 @@ The agentic software delivery framework is a set of tools, conventions, and prot
 that standardise AI-assisted software development across projects. It consists
 of three layers:
 
-1. **Template repo** (`eddiecarpenter/agentic-development`) — global standards and agent protocol
+1. **Template repo** (`eddiecarpenter/ai-native-delivery`) — global standards and agent protocol
 2. **Extension** (`eddiecarpenter/gh-agentic`) — tooling that creates and manages environments
 3. **Project repos** — the actual software being built, governed by the framework
 
@@ -16,7 +16,7 @@ of three layers:
 
 | Repo | Type | Purpose |
 |---|---|---|
-| `eddiecarpenter/agentic-development` | Template | Holds `base/AGENTS.md`, language standards, workflow definitions. Never cloned directly — consumed via `gh repo create --template`. |
+| `eddiecarpenter/ai-native-delivery` | Template | Holds `base/AGENTS.md`, language standards, workflow definitions. Never cloned directly — consumed via `gh repo create --template`. |
 | `eddiecarpenter/gh-agentic` | Tool | GitHub CLI extension. Bootstraps environments, registers repos, syncs base/. |
 
 ---
@@ -90,7 +90,7 @@ Agent behaviour is defined in two layers:
 `CLAUDE.md` loads both via `@base/AGENTS.md` and `@AGENTS.local.md`.
 
 `base/` is read-only for AI agents — changes must go through the template repo
-(`eddiecarpenter/agentic-development`) and flow in via `gh agentic sync`.
+(`eddiecarpenter/ai-native-delivery`) and flow in via `gh agentic sync`.
 
 ---
 
@@ -99,7 +99,7 @@ Agent behaviour is defined in two layers:
 Each project records its template source and last synced version:
 
 ```
-TEMPLATE_SOURCE   → eddiecarpenter/agentic-development
+TEMPLATE_SOURCE   → eddiecarpenter/ai-native-delivery
 TEMPLATE_VERSION  → v0.1.0
 ```
 
