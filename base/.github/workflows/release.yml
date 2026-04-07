@@ -5,9 +5,12 @@ name: Release
 #   git tag v1.2.3
 #   git push origin v1.2.3
 #
-# This workflow generates AI release notes and creates the GitHub release.
-# The local project's build workflow triggers on "release: published" — see
-# base/docs/examples/publish-release.yml for the recommended pattern.
+# This workflow runs the Release recipe via Goose, which generates AI release
+# notes from git history and creates the GitHub release.
+#
+# After this workflow completes, the publish-release.yml workflow fires
+# (triggered by "release: published") for any post-release steps the local
+# project requires — see base/docs/examples/publish-release.yml.
 
 on:
   push:
@@ -16,70 +19,66 @@ on:
 
 jobs:
   release:
+    name: Release
     runs-on: ${{ vars.RUNNER_LABEL || 'ubuntu-latest' }}
     permissions:
       contents: write
+
     steps:
       - name: Checkout
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd  # v6.0.2
         with:
           fetch-depth: 0  # full history required to find previous tag and commits
+          token: ${{ secrets.GOOSE_AGENT_PAT }}
 
-      - name: Generate release notes
-        id: notes
-        env:
-          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+      - name: Setup Node.js
+        uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f  # v6.3.0
+        with:
+          node-version: 'lts/*'
+
+      - name: Install tools
         run: |
-          TAG="${{ github.ref_name }}"
-          PREV_TAG=$(git tag --sort=-version:refname | grep -v "^${TAG}$" | head -1)
+          sudo apt-get update -qq && sudo apt-get install -y bzip2 libgomp1
+          mkdir -p ~/.local/bin
+          GH_VERSION=$(curl -fsSL https://api.github.com/repos/cli/cli/releases/latest | grep '"tag_name"' | sed 's/.*"v\([^"]*\)".*/\1/')
+          curl -fsSL "https://github.com/cli/cli/releases/download/v${GH_VERSION}/gh_${GH_VERSION}_linux_amd64.tar.gz" -o /tmp/gh.tar.gz
+          tar -xz -C /tmp -f /tmp/gh.tar.gz
+          mv /tmp/gh_${GH_VERSION}_linux_amd64/bin/gh ~/.local/bin/gh
+          GOOSE_VERSION=$(curl -fsSL https://api.github.com/repos/block/goose/releases/latest | grep '"tag_name"' | sed 's/.*"v\([^"]*\)".*/\1/')
+          curl -fsSL "https://github.com/block/goose/releases/download/v${GOOSE_VERSION}/goose-x86_64-unknown-linux-gnu.tar.bz2" -o /tmp/goose.tar.bz2
+          tar -xj -C ~/.local/bin -f /tmp/goose.tar.bz2
+          echo "$HOME/.local/bin" >> $GITHUB_PATH
+          npm install -g @anthropic-ai/claude-code
 
-          if [ -n "$ANTHROPIC_API_KEY" ]; then
-            if [ -z "$PREV_TAG" ]; then
-              COMMITS=$(git log --pretty=format:"- %s (%h)")
-              RANGE_DESC="initial release"
-            else
-              COMMITS=$(git log --pretty=format:"- %s (%h)" "${PREV_TAG}..HEAD")
-              RANGE_DESC="changes since ${PREV_TAG}"
-            fi
-
-            PROMPT="Generate release notes for ${TAG}. ${RANGE_DESC}:
-
-${COMMITS}
-
-Write concise markdown release notes: one short summary sentence describing the release, then group changes under these headings (omit any heading with no entries):
-## Features
-## Fixes
-## Documentation
-## Chores
-
-Be concise and human-readable. Do not include the tag name or a title — that is added separately."
-
-            API_RESPONSE=$(jq -n \
-              --arg prompt "$PROMPT" \
-              '{"model":"claude-3-5-haiku-20241022","max_tokens":1024,"messages":[{"role":"user","content":$prompt}]}' \
-              | curl -sf https://api.anthropic.com/v1/messages \
-                -H "x-api-key: ${ANTHROPIC_API_KEY}" \
-                -H "anthropic-version: 2023-06-01" \
-                -H "content-type: application/json" \
-                -d @-)
-
-            printf '%s' "$(echo "$API_RESPONSE" | jq -r '.content[0].text')" > /tmp/release-notes.md
-            echo "AI-generated release notes written to /tmp/release-notes.md"
-            cat /tmp/release-notes.md
-          else
-            echo "ANTHROPIC_API_KEY not set — GitHub will auto-generate notes from merged PRs"
-          fi
-
-      - name: Create GitHub Release
+      - name: Restore Claude Code auth
         run: |
-          if [ -f /tmp/release-notes.md ]; then
-            gh release create "${{ github.ref_name }}" \
-              --title "Release ${{ github.ref_name }}" \
-              --notes-file /tmp/release-notes.md
-          else
-            gh release create "${{ github.ref_name }}" \
-              --title "Release ${{ github.ref_name }}" \
-              --generate-notes
-          fi
+          mkdir -p ~/.claude
+          echo "${{ secrets.CLAUDE_CREDENTIALS_JSON }}" | base64 -d > ~/.claude/.credentials.json
+          chmod 0600 ~/.claude/.credentials.json
+
+      - name: Configure environment
+        run: |
+          git config user.name "${{ vars.AGENT_USER || 'github-actions[bot]' }}"
+          git config user.email "${{ vars.AGENT_USER || 'github-actions[bot]' }}@users.noreply.github.com"
+
+      - name: Configure Goose
+        run: |
+          mkdir -p ~/.config/goose
+          cat > ~/.config/goose/config.yaml <<GOOSEEOF
+          GOOSE_PROVIDER: ${{ vars.GOOSE_PROVIDER || 'claude-code' }}
+          GOOSE_MODEL: ${{ vars.GOOSE_MODEL || 'default' }}
+          GOOSEEOF
+
+      - name: Run release recipe
+        run: |
+          goose run \
+            --recipe .goose/recipes/release.yaml \
+            --params tag=${{ github.ref_name }} \
+            --params repo=${{ github.repository }}
         env:
-          GH_TOKEN: ${{ github.token }}
+          GOOSE_PATH_ROOT: ${{ github.workspace }}/.goose
+          GOOSE_PROVIDER: ${{ vars.GOOSE_PROVIDER || 'claude-code' }}
+          GOOSE_MODEL: ${{ vars.GOOSE_MODEL || 'default' }}
+          GOOSE_MODE: auto
+          GOOSE_DISABLE_SESSION_NAMING: "true"
+          GH_TOKEN: ${{ secrets.GOOSE_AGENT_PAT }}
