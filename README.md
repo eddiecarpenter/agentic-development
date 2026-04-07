@@ -518,35 +518,27 @@ are never touched.
 
 ## Releasing a new version
 
-Releases are triggered by editing `.github/release.yml`. The framework uses the
-Maven SNAPSHOT convention:
+Push a tag — that is the complete release act:
 
-```yaml
-version: "0.7.0"        # last released version
-next: "0.8.0-SNAPSHOT"  # currently in development
+```bash
+git tag v1.2.3
+git push origin v1.2.3
 ```
 
-**To cut a release:**
+The release workflow fires automatically:
+- Generates AI release notes from commits since the previous tag
+- Creates the GitHub release with those notes
 
-1. Edit `.github/release.yml` — remove `-SNAPSHOT` from `next`:
-   ```yaml
-   version: "0.7.0"
-   next: "0.8.0"
-   ```
-2. Commit and merge to `main`
-3. The release workflow fires automatically:
-   - Generates AI release notes from commits since the last tag
-   - Writes `.github/RELEASE_NOTES.md`
-   - Creates and pushes git tag `v0.8.0`
-   - Updates the version file: `version: "0.8.0"`, `next: "0.9.0-SNAPSHOT"`
-
-The git tag is the handoff to the local build process. See
-`base/docs/examples/publish-release.yml` for an example workflow that creates the
-GitHub release from the generated notes.
+If `ANTHROPIC_API_KEY` is not configured as a repo secret, GitHub auto-generates
+notes from merged PRs instead.
 
 Use [semantic versioning](https://semver.org): `fix:` → patch, `feat:` → minor, breaking change → major.
 
-> Releasing is a deliberate human action — editing the version file is the authorisation.
+For projects that produce build artefacts, provide a workflow in your repo that
+triggers on `on: release: types: [published]` — it fires after the framework has
+created the release. See `base/docs/examples/publish-release.yml` for a starting point.
+
+> Releasing is a deliberate human action — pushing the tag is the authorisation.
 > Releases have a cost (AI tokens, build pipeline). Do not release unnecessarily.
 
 ---

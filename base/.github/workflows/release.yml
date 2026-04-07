@@ -1,0 +1,85 @@
+name: Release
+
+# Triggered by a version tag push.
+# The human's act of pushing a tag is the complete release authorisation:
+#   git tag v1.2.3
+#   git push origin v1.2.3
+#
+# This workflow generates AI release notes and creates the GitHub release.
+# The local project's build workflow triggers on "release: published" — see
+# base/docs/examples/publish-release.yml for the recommended pattern.
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  release:
+    runs-on: ${{ vars.RUNNER_LABEL || 'ubuntu-latest' }}
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd  # v6.0.2
+        with:
+          fetch-depth: 0  # full history required to find previous tag and commits
+
+      - name: Generate release notes
+        id: notes
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: |
+          TAG="${{ github.ref_name }}"
+          PREV_TAG=$(git tag --sort=-version:refname | grep -v "^${TAG}$" | head -1)
+
+          if [ -n "$ANTHROPIC_API_KEY" ]; then
+            if [ -z "$PREV_TAG" ]; then
+              COMMITS=$(git log --pretty=format:"- %s (%h)")
+              RANGE_DESC="initial release"
+            else
+              COMMITS=$(git log --pretty=format:"- %s (%h)" "${PREV_TAG}..HEAD")
+              RANGE_DESC="changes since ${PREV_TAG}"
+            fi
+
+            PROMPT="Generate release notes for ${TAG}. ${RANGE_DESC}:
+
+${COMMITS}
+
+Write concise markdown release notes: one short summary sentence describing the release, then group changes under these headings (omit any heading with no entries):
+## Features
+## Fixes
+## Documentation
+## Chores
+
+Be concise and human-readable. Do not include the tag name or a title — that is added separately."
+
+            API_RESPONSE=$(jq -n \
+              --arg prompt "$PROMPT" \
+              '{"model":"claude-3-5-haiku-20241022","max_tokens":1024,"messages":[{"role":"user","content":$prompt}]}' \
+              | curl -sf https://api.anthropic.com/v1/messages \
+                -H "x-api-key: ${ANTHROPIC_API_KEY}" \
+                -H "anthropic-version: 2023-06-01" \
+                -H "content-type: application/json" \
+                -d @-)
+
+            printf '%s' "$(echo "$API_RESPONSE" | jq -r '.content[0].text')" > /tmp/release-notes.md
+            echo "AI-generated release notes written to /tmp/release-notes.md"
+            cat /tmp/release-notes.md
+          else
+            echo "ANTHROPIC_API_KEY not set — GitHub will auto-generate notes from merged PRs"
+          fi
+
+      - name: Create GitHub Release
+        run: |
+          if [ -f /tmp/release-notes.md ]; then
+            gh release create "${{ github.ref_name }}" \
+              --title "Release ${{ github.ref_name }}" \
+              --notes-file /tmp/release-notes.md
+          else
+            gh release create "${{ github.ref_name }}" \
+              --title "Release ${{ github.ref_name }}" \
+              --generate-notes
+          fi
+        env:
+          GH_TOKEN: ${{ github.token }}

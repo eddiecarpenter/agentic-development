@@ -88,50 +88,48 @@ A release has a cost — AI tokens to generate notes, build pipeline execution. 
 should never fire unnecessarily. The framework's position: **a release requires a
 deliberate human act to trigger.** There is no automatic release on every merge.
 
-### The Version File
-
-Every repo using this framework maintains `.github/release.yml`:
-
-```yaml
-version: "0.7.0"        # last released version
-next: "0.8.0-SNAPSHOT"  # currently in development
-```
-
-This borrows the Maven SNAPSHOT convention:
-- `x.y.z-SNAPSHOT` means the repo is developing towards version `x.y.z`
-- Removing `-SNAPSHOT` from `next` is the release trigger
-- The human controls both the timing and the version number
-
 ### The Release Trigger
 
-A GitHub Actions workflow monitors `.github/release.yml`. When `next` no longer
-contains `-SNAPSHOT`, the release workflow fires:
+Pushing a git tag is the complete release act:
 
-1. Generate AI release notes from git history since the last tag
-2. Write `.github/RELEASE_NOTES.md` and commit to `main`
-3. Update `version` to the released value
-4. Create and push the git tag
-5. Bump `next` to the next SNAPSHOT
+```bash
+git tag v1.2.3
+git push origin v1.2.3
+```
+
+No version file. No naming convention imposed. Git already knows the last released
+version — it is the previous tag. The tag is the version. The human controls both
+the timing and the version number. How the project manages its internal versioning
+(POM files, `package.json`, `go.mod`, ldflags) is entirely its own concern.
+
+### The Framework Release Workflow
+
+A GitHub Actions workflow in `base/.github/workflows/release.yml` triggers on any
+`v*` tag push:
+
+1. Determine the previous tag from git history
+2. Collect all commits since the previous tag
+3. Generate AI release notes via the Anthropic API
+4. Fall back to GitHub auto-generated notes if `ANTHROPIC_API_KEY` is not configured
+5. Create the GitHub release with the generated notes
+
+The framework's responsibility ends when the GitHub release is created and published.
 
 ### Handoff to the Local Build
 
-The framework's responsibility ends when the tag is pushed. The git tag is the
-universal handoff point — every language ecosystem knows how to trigger on one.
+The local project provides its own build workflow, triggered by
+`on: release: types: [published]`. This trigger fires only after the framework
+has created and published the release — eliminating race conditions.
 
-The release notes are committed to `main` as `.github/RELEASE_NOTES.md`. Any
-downstream workflow triggered by the tag can access this file by checking out the
-tagged commit.
-
-The framework provides an example workflow that creates the GitHub release using
-the notes file. Projects that produce build artefacts extend this example with
-their own build steps. The framework has no knowledge of and no dependency on
-the local build process.
+The framework provides an example at `base/docs/examples/publish-release.yml`.
+Projects copy and adapt it. The framework does not manage or sync it.
 
 ### What the Framework Does NOT Own
 
 - How artefacts are built or what they contain
 - Where artefacts are published (registries, package managers, CDNs)
-- Release scheduling — the human decides when to edit the version file
+- Release cadence — the human decides when to push the tag
+- Internal project versioning — POM files, `package.json`, `go.mod`, ldflags, etc.
 - Deployment execution — loading the release into a production environment
 
 ---

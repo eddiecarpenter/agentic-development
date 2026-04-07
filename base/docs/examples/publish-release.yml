@@ -1,0 +1,95 @@
+# publish-release.yml — Example downstream release workflow
+#
+# Copy this file to .github/workflows/publish-release.yml in your repo.
+# Adapt the build steps for your project. You own this file — it is not
+# managed or synced by the ai-native-delivery framework.
+#
+# This workflow triggers AFTER the framework release workflow has created
+# and published the GitHub release (on: release: types: [published]).
+# Using this trigger instead of "on: push: tags" eliminates race conditions —
+# your build only starts once the release and its notes already exist.
+#
+# The framework release workflow handles:
+#   - AI release note generation
+#   - GitHub release creation
+#
+# This workflow handles:
+#   - Building your artefacts
+#   - Attaching artefacts to the existing release
+#   - Publishing to registries (if applicable)
+
+name: Publish Release
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write  # required to upload release artefacts
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd  # v6.0.2
+        with:
+          ref: ${{ github.event.release.tag_name }}
+
+      # ------------------------------------------------------------------ #
+      # Add your build steps here. Examples:
+      # ------------------------------------------------------------------ #
+
+      # Go — using GoReleaser (recommended for Go projects)
+      # GoReleaser builds all platform targets, packages them, and uploads
+      # to the existing GitHub release. Pass --release-notes /dev/null to
+      # skip GoReleaser's own note generation (notes are already set).
+      #
+      # - name: Set up Go
+      #   uses: actions/setup-go@v5
+      #   with:
+      #     go-version: 'stable'
+      #
+      # - name: Run GoReleaser
+      #   uses: goreleaser/goreleaser-action@v6
+      #   with:
+      #     args: release --clean
+      #   env:
+      #     GITHUB_TOKEN: ${{ github.token }}
+      #     GORELEASER_CURRENT_TAG: ${{ github.event.release.tag_name }}
+
+      # ------------------------------------------------------------------ #
+
+      # Generic — build artefacts and attach to the release manually
+      #
+      # - name: Build
+      #   run: |
+      #     mkdir -p dist
+      #     # your build command here, output to dist/
+      #
+      # - name: Upload artefacts
+      #   run: |
+      #     gh release upload "${{ github.event.release.tag_name }}" dist/*
+      #   env:
+      #     GH_TOKEN: ${{ github.token }}
+
+      # ------------------------------------------------------------------ #
+
+      # Node / npm — publish to registry
+      #
+      # - name: Set up Node
+      #   uses: actions/setup-node@v4
+      #   with:
+      #     node-version: 'lts/*'
+      #     registry-url: 'https://registry.npmjs.org'
+      #
+      # - name: Publish
+      #   run: npm publish
+      #   env:
+      #     NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      # ------------------------------------------------------------------ #
+      # If your project has no build artefacts (documentation repos,
+      # framework repos, etc.), this workflow is not needed — the framework
+      # release workflow is sufficient on its own.
+      # ------------------------------------------------------------------ #
