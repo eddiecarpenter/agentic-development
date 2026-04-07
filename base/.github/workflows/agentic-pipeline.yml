@@ -46,16 +46,18 @@ jobs:
           fetch-depth: 0
           token: ${{ secrets.GOOSE_AGENT_PAT }}
 
-      - name: Install Goose
+      - name: Install tools
         run: |
+          mkdir -p ~/.local/bin
+          GH_VERSION=$(curl -fsSL https://api.github.com/repos/cli/cli/releases/latest | grep '"tag_name"' | sed 's/.*"v\([^"]*\)".*/\1/')
+          curl -fsSL "https://github.com/cli/cli/releases/download/v${GH_VERSION}/gh_${GH_VERSION}_linux_amd64.tar.gz" -o /tmp/gh.tar.gz
+          tar -xz -C /tmp -f /tmp/gh.tar.gz
+          mv /tmp/gh_${GH_VERSION}_linux_amd64/bin/gh ~/.local/bin/gh
           GOOSE_VERSION=$(curl -fsSL https://api.github.com/repos/block/goose/releases/latest | grep '"tag_name"' | sed 's/.*"v\([^"]*\)".*/\1/')
           curl -fsSL "https://github.com/block/goose/releases/download/v${GOOSE_VERSION}/goose-x86_64-unknown-linux-gnu.tar.bz2" -o /tmp/goose.tar.bz2
-          mkdir -p ~/.local/bin
           tar -xj -C ~/.local/bin -f /tmp/goose.tar.bz2
           echo "$HOME/.local/bin" >> $GITHUB_PATH
-
-      - name: Install Claude Code CLI
-        run: npm install -g @anthropic-ai/claude-code
+          npm install -g @anthropic-ai/claude-code
 
       - name: Restore Claude Code auth
         run: |
@@ -108,6 +110,15 @@ jobs:
       pull-requests: write
 
     steps:
+      - name: Install gh CLI
+        run: |
+          mkdir -p ~/.local/bin
+          GH_VERSION=$(curl -fsSL https://api.github.com/repos/cli/cli/releases/latest | grep '"tag_name"' | sed 's/.*"v\([^"]*\)".*/\1/')
+          curl -fsSL "https://github.com/cli/cli/releases/download/v${GH_VERSION}/gh_${GH_VERSION}_linux_amd64.tar.gz" -o /tmp/gh.tar.gz
+          tar -xz -C /tmp -f /tmp/gh.tar.gz
+          mv /tmp/gh_${GH_VERSION}_linux_amd64/bin/gh ~/.local/bin/gh
+          echo "$HOME/.local/bin" >> $GITHUB_PATH
+
       - name: Resolve feature branch
         id: branch
         env:
@@ -130,16 +141,12 @@ jobs:
           fetch-depth: 0
           token: ${{ secrets.GOOSE_AGENT_PAT }}
 
-      - name: Install Goose
+      - name: Install Goose and Claude Code CLI
         run: |
           GOOSE_VERSION=$(curl -fsSL https://api.github.com/repos/block/goose/releases/latest | grep '"tag_name"' | sed 's/.*"v\([^"]*\)".*/\1/')
           curl -fsSL "https://github.com/block/goose/releases/download/v${GOOSE_VERSION}/goose-x86_64-unknown-linux-gnu.tar.bz2" -o /tmp/goose.tar.bz2
-          mkdir -p ~/.local/bin
           tar -xj -C ~/.local/bin -f /tmp/goose.tar.bz2
-          echo "$HOME/.local/bin" >> $GITHUB_PATH
-
-      - name: Install Claude Code CLI
-        run: npm install -g @anthropic-ai/claude-code
+          npm install -g @anthropic-ai/claude-code
 
       - name: Restore Claude Code auth
         run: |
@@ -265,16 +272,18 @@ jobs:
           fetch-depth: 0
           token: ${{ secrets.GOOSE_AGENT_PAT }}
 
-      - name: Install Goose
+      - name: Install tools
         run: |
+          mkdir -p ~/.local/bin
+          GH_VERSION=$(curl -fsSL https://api.github.com/repos/cli/cli/releases/latest | grep '"tag_name"' | sed 's/.*"v\([^"]*\)".*/\1/')
+          curl -fsSL "https://github.com/cli/cli/releases/download/v${GH_VERSION}/gh_${GH_VERSION}_linux_amd64.tar.gz" -o /tmp/gh.tar.gz
+          tar -xz -C /tmp -f /tmp/gh.tar.gz
+          mv /tmp/gh_${GH_VERSION}_linux_amd64/bin/gh ~/.local/bin/gh
           GOOSE_VERSION=$(curl -fsSL https://api.github.com/repos/block/goose/releases/latest | grep '"tag_name"' | sed 's/.*"v\([^"]*\)".*/\1/')
           curl -fsSL "https://github.com/block/goose/releases/download/v${GOOSE_VERSION}/goose-x86_64-unknown-linux-gnu.tar.bz2" -o /tmp/goose.tar.bz2
-          mkdir -p ~/.local/bin
           tar -xj -C ~/.local/bin -f /tmp/goose.tar.bz2
           echo "$HOME/.local/bin" >> $GITHUB_PATH
-
-      - name: Install Claude Code CLI
-        run: npm install -g @anthropic-ai/claude-code
+          npm install -g @anthropic-ai/claude-code
 
       - name: Restore Claude Code auth
         run: |
@@ -353,16 +362,18 @@ jobs:
           fetch-depth: 0
           token: ${{ secrets.GOOSE_AGENT_PAT }}
 
-      - name: Install Goose
+      - name: Install tools
         run: |
+          mkdir -p ~/.local/bin
+          GH_VERSION=$(curl -fsSL https://api.github.com/repos/cli/cli/releases/latest | grep '"tag_name"' | sed 's/.*"v\([^"]*\)".*/\1/')
+          curl -fsSL "https://github.com/cli/cli/releases/download/v${GH_VERSION}/gh_${GH_VERSION}_linux_amd64.tar.gz" -o /tmp/gh.tar.gz
+          tar -xz -C /tmp -f /tmp/gh.tar.gz
+          mv /tmp/gh_${GH_VERSION}_linux_amd64/bin/gh ~/.local/bin/gh
           GOOSE_VERSION=$(curl -fsSL https://api.github.com/repos/block/goose/releases/latest | grep '"tag_name"' | sed 's/.*"v\([^"]*\)".*/\1/')
           curl -fsSL "https://github.com/block/goose/releases/download/v${GOOSE_VERSION}/goose-x86_64-unknown-linux-gnu.tar.bz2" -o /tmp/goose.tar.bz2
-          mkdir -p ~/.local/bin
           tar -xj -C ~/.local/bin -f /tmp/goose.tar.bz2
           echo "$HOME/.local/bin" >> $GITHUB_PATH
-
-      - name: Install Claude Code CLI
-        run: npm install -g @anthropic-ai/claude-code
+          npm install -g @anthropic-ai/claude-code
 
       - name: Restore Claude Code auth
         run: |
