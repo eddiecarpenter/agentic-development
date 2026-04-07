@@ -63,6 +63,14 @@ jobs:
           git config user.name "${{ vars.AGENT_USER }}"
           git config user.email "${{ vars.AGENT_USER }}@users.noreply.github.com"
 
+      - name: Configure Goose
+        run: |
+          mkdir -p ~/.config/goose
+          cat > ~/.config/goose/config.yaml <<GOOSEEOF
+          GOOSE_PROVIDER: ${{ vars.GOOSE_PROVIDER || 'claude-code' }}
+          GOOSE_MODEL: ${{ vars.GOOSE_MODEL || 'default' }}
+          GOOSEEOF
+
       - name: Run feature-design recipe
         run: |
           goose run \
@@ -71,8 +79,8 @@ jobs:
             --params repo=${{ github.repository }}
         env:
           GOOSE_PATH_ROOT: ${{ github.workspace }}/.goose
-          GOOSE_PROVIDER: claude-code
-          GOOSE_MODEL: default
+          GOOSE_PROVIDER: ${{ vars.GOOSE_PROVIDER || 'claude-code' }}
+          GOOSE_MODEL: ${{ vars.GOOSE_MODEL || 'default' }}
           GOOSE_MODE: auto
           GOOSE_DISABLE_SESSION_NAMING: "true"
           GH_TOKEN: ${{ secrets.GOOSE_AGENT_PAT }}
@@ -143,6 +151,14 @@ jobs:
             exit 1
           fi
 
+      - name: Configure Goose
+        run: |
+          mkdir -p ~/.config/goose
+          cat > ~/.config/goose/config.yaml <<GOOSEEOF
+          GOOSE_PROVIDER: ${{ vars.GOOSE_PROVIDER || 'claude-code' }}
+          GOOSE_MODEL: ${{ vars.GOOSE_MODEL || 'default' }}
+          GOOSEEOF
+
       - name: Run dev-session recipe
         id: goose
         run: |
@@ -167,8 +183,8 @@ jobs:
           done
         env:
           GOOSE_PATH_ROOT: ${{ github.workspace }}/.goose
-          GOOSE_PROVIDER: claude-code
-          GOOSE_MODEL: default
+          GOOSE_PROVIDER: ${{ vars.GOOSE_PROVIDER || 'claude-code' }}
+          GOOSE_MODEL: ${{ vars.GOOSE_MODEL || 'default' }}
           GOOSE_MODE: auto
           GOOSE_DISABLE_SESSION_NAMING: "true"
           GH_TOKEN: ${{ secrets.GOOSE_AGENT_PAT }}
@@ -245,13 +261,21 @@ jobs:
           git config user.name "${{ vars.AGENT_USER }}"
           git config user.email "${{ vars.AGENT_USER }}@users.noreply.github.com"
 
+      - name: Configure Goose
+        run: |
+          mkdir -p ~/.config/goose
+          cat > ~/.config/goose/config.yaml <<GOOSEEOF
+          GOOSE_PROVIDER: ${{ vars.GOOSE_PROVIDER || 'claude-code' }}
+          GOOSE_MODEL: ${{ vars.GOOSE_MODEL || 'default' }}
+          GOOSEEOF
+
       - name: Run PR review recipe
         env:
           PR_NUMBER: ${{ github.event.inputs.pr_number || github.event.pull_request.number }}
           BRANCH: ${{ github.event.inputs.branch_name || github.event.pull_request.head.ref }}
           GOOSE_PATH_ROOT: ${{ github.workspace }}/.goose
-          GOOSE_PROVIDER: claude-code
-          GOOSE_MODEL: default
+          GOOSE_PROVIDER: ${{ vars.GOOSE_PROVIDER || 'claude-code' }}
+          GOOSE_MODEL: ${{ vars.GOOSE_MODEL || 'default' }}
           GOOSE_MODE: auto
           GOOSE_DISABLE_SESSION_NAMING: "true"
           GH_TOKEN: ${{ secrets.GOOSE_AGENT_PAT }}
@@ -320,6 +344,14 @@ jobs:
           git config user.name "${{ vars.AGENT_USER }}"
           git config user.email "${{ vars.AGENT_USER }}@users.noreply.github.com"
 
+      - name: Configure Goose
+        run: |
+          mkdir -p ~/.config/goose
+          cat > ~/.config/goose/config.yaml <<GOOSEEOF
+          GOOSE_PROVIDER: ${{ vars.GOOSE_PROVIDER || 'claude-code' }}
+          GOOSE_MODEL: ${{ vars.GOOSE_MODEL || 'default' }}
+          GOOSEEOF
+
       - name: Run issue session recipe
         run: |
           goose run \
@@ -328,8 +360,8 @@ jobs:
             --params repo=${{ github.repository }}
         env:
           GOOSE_PATH_ROOT: ${{ github.workspace }}/.goose
-          GOOSE_PROVIDER: claude-code
-          GOOSE_MODEL: default
+          GOOSE_PROVIDER: ${{ vars.GOOSE_PROVIDER || 'claude-code' }}
+          GOOSE_MODEL: ${{ vars.GOOSE_MODEL || 'default' }}
           GOOSE_MODE: auto
           GOOSE_DISABLE_SESSION_NAMING: "true"
           GH_TOKEN: ${{ secrets.GOOSE_AGENT_PAT }}
