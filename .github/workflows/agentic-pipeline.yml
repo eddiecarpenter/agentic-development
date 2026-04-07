@@ -48,7 +48,10 @@ jobs:
 
       - name: Install Goose
         run: |
-          curl -fsSL https://github.com/block/goose/releases/latest/download/download_cli.sh | bash
+          GOOSE_VERSION=$(curl -fsSL https://api.github.com/repos/block/goose/releases/latest | grep '"tag_name"' | sed 's/.*"v\([^"]*\)".*/\1/')
+          curl -fsSL "https://github.com/block/goose/releases/download/v${GOOSE_VERSION}/goose-x86_64-unknown-linux-gnu.tar.bz2" -o /tmp/goose.tar.bz2
+          mkdir -p ~/.local/bin
+          tar -xj -C ~/.local/bin -f /tmp/goose.tar.bz2
           echo "$HOME/.local/bin" >> $GITHUB_PATH
 
       - name: Install Claude Code CLI
@@ -129,7 +132,10 @@ jobs:
 
       - name: Install Goose
         run: |
-          curl -fsSL https://github.com/block/goose/releases/latest/download/download_cli.sh | bash
+          GOOSE_VERSION=$(curl -fsSL https://api.github.com/repos/block/goose/releases/latest | grep '"tag_name"' | sed 's/.*"v\([^"]*\)".*/\1/')
+          curl -fsSL "https://github.com/block/goose/releases/download/v${GOOSE_VERSION}/goose-x86_64-unknown-linux-gnu.tar.bz2" -o /tmp/goose.tar.bz2
+          mkdir -p ~/.local/bin
+          tar -xj -C ~/.local/bin -f /tmp/goose.tar.bz2
           echo "$HOME/.local/bin" >> $GITHUB_PATH
 
       - name: Install Claude Code CLI
@@ -250,7 +256,10 @@ jobs:
 
       - name: Install Goose
         run: |
-          curl -fsSL https://github.com/block/goose/releases/latest/download/download_cli.sh | bash
+          GOOSE_VERSION=$(curl -fsSL https://api.github.com/repos/block/goose/releases/latest | grep '"tag_name"' | sed 's/.*"v\([^"]*\)".*/\1/')
+          curl -fsSL "https://github.com/block/goose/releases/download/v${GOOSE_VERSION}/goose-x86_64-unknown-linux-gnu.tar.bz2" -o /tmp/goose.tar.bz2
+          mkdir -p ~/.local/bin
+          tar -xj -C ~/.local/bin -f /tmp/goose.tar.bz2
           echo "$HOME/.local/bin" >> $GITHUB_PATH
 
       - name: Install Claude Code CLI
@@ -335,7 +344,10 @@ jobs:
 
       - name: Install Goose
         run: |
-          curl -fsSL https://github.com/block/goose/releases/latest/download/download_cli.sh | bash
+          GOOSE_VERSION=$(curl -fsSL https://api.github.com/repos/block/goose/releases/latest | grep '"tag_name"' | sed 's/.*"v\([^"]*\)".*/\1/')
+          curl -fsSL "https://github.com/block/goose/releases/download/v${GOOSE_VERSION}/goose-x86_64-unknown-linux-gnu.tar.bz2" -o /tmp/goose.tar.bz2
+          mkdir -p ~/.local/bin
+          tar -xj -C ~/.local/bin -f /tmp/goose.tar.bz2
           echo "$HOME/.local/bin" >> $GITHUB_PATH
 
       - name: Install Claude Code CLI
