@@ -57,6 +57,20 @@ jobs:
           echo "${{ secrets.CLAUDE_CREDENTIALS_JSON }}" | base64 -d > ~/.claude/.credentials.json
           chmod 0600 ~/.claude/.credentials.json
 
+      - name: Validate Claude Code credentials
+        run: |
+          if [ ! -s ~/.claude/.credentials.json ]; then
+            echo "ERROR: ~/.claude/.credentials.json is empty or missing."
+            echo "Ensure CLAUDE_CREDENTIALS_JSON is set to: cat ~/.claude/.credentials.json | base64 | tr -d '\\n'"
+            exit 1
+          fi
+          if ! python3 -c "import json,sys; json.load(open('$HOME/.claude/.credentials.json'))" 2>/dev/null; then
+            echo "ERROR: ~/.claude/.credentials.json is not valid JSON."
+            echo "Regenerate with: cat ~/.claude/.credentials.json | base64 | tr -d '\\n'"
+            exit 1
+          fi
+          echo "Credentials file present and valid JSON."
+
       - name: Configure environment
         run: |
           git config user.name "${{ vars.AGENT_USER || 'github-actions[bot]' }}"
