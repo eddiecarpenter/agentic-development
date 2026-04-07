@@ -46,6 +46,11 @@ jobs:
           fetch-depth: 0
           token: ${{ secrets.GOOSE_AGENT_PAT }}
 
+      - name: Setup Node.js
+        uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f  # v6.3.0
+        with:
+          node-version: 'lts/*'
+
       - name: Install tools
         run: |
           sudo apt-get update -qq && sudo apt-get install -y bzip2
@@ -141,6 +146,11 @@ jobs:
           ref: ${{ steps.branch.outputs.name }}
           fetch-depth: 0
           token: ${{ secrets.GOOSE_AGENT_PAT }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f  # v6.3.0
+        with:
+          node-version: 'lts/*'
 
       - name: Install Goose and Claude Code CLI
         run: |
@@ -274,6 +284,11 @@ jobs:
           fetch-depth: 0
           token: ${{ secrets.GOOSE_AGENT_PAT }}
 
+      - name: Setup Node.js
+        uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f  # v6.3.0
+        with:
+          node-version: 'lts/*'
+
       - name: Install tools
         run: |
           sudo apt-get update -qq && sudo apt-get install -y bzip2
@@ -364,6 +379,11 @@ jobs:
           ref: main
           fetch-depth: 0
           token: ${{ secrets.GOOSE_AGENT_PAT }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f  # v6.3.0
+        with:
+          node-version: 'lts/*'
 
       - name: Install tools
         run: |
