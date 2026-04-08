@@ -1,9 +1,25 @@
 # Dev Session — Stage 4
 
+## ⛔ Automation-Only — Do Not Execute Interactively
+
+This session is triggered exclusively by GitHub Actions when a Feature issue receives
+the `in-development` label. It must never be run manually by an agent in an interactive session.
+
+If you are reading this skill in an interactive session, stop immediately and print:
+
+```
+REFUSED: Dev Session is automation-only.
+It runs automatically when in-development is applied.
+Do not execute this session interactively.
+```
+
+Do not proceed past this point in an interactive context.
+
+---
+
 ## Purpose
 
 Implement all open Task sub-issues on the feature branch, in order.
-This session is run by automation — not by humans directly.
 
 ## When it Runs
 

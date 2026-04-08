@@ -47,6 +47,16 @@ Execute these steps in order — do not skip any:
    `skills/` (local, if the directory exists). Local skills in `skills/` take
    precedence over template skills in `base/skills/` of the same name.
 
+   **Automation-only skills** — the following skills are loaded for reference only.
+   They must never be executed in an interactive session:
+   - `feature-design.md` — runs automatically on `in-design` label
+   - `dev-session.md` — runs automatically on `in-development` label
+   - `pr-review-session.md` — runs automatically on PR review submission
+   - `issue-session.md` — runs automatically on issue assignment
+
+   If asked to run any of these interactively, refuse and explain that GitHub Actions
+   handles them automatically.
+
 7. Read `TEMPLATE_VERSION` and note the current version.
 
 ## On Completion

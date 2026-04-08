@@ -28,6 +28,7 @@ Open Goose and select the **Requirements Session (Stage 1)** recipe.
      Scoping Session separately
 
 7. Prints: `=== Requirements Session (Phase 1) — Completed ===`
+8. **EXIT. Do not proceed further — even if the next steps are obvious.**
 
 ## Completing Scoping Early
 
@@ -58,6 +59,10 @@ When the scope is clear enough to define the Feature(s) without a separate sessi
    Feature(s) triggered: #N
    Feature(s) held (dependency): #N — waiting for <feature/PR reference> to merge first.
    ```
+
+8. **EXIT immediately after printing the summary. Do not proceed to Feature Design.**
+   The `in-design` label has been applied — GitHub Actions will run the next session.
+   Continuing into Feature Design or Dev Session from here is a defect.
 
 ## Outputs
 

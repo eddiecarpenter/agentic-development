@@ -1,9 +1,25 @@
 # Feature Design — Stage 3
 
+## ⛔ Automation-Only — Do Not Execute Interactively
+
+This session is triggered exclusively by GitHub Actions when a Feature issue receives
+the `in-design` label. It must never be run manually by an agent in an interactive session.
+
+If you are reading this skill in an interactive session, stop immediately and print:
+
+```
+REFUSED: Feature Design is automation-only.
+It runs automatically when in-design is applied.
+Do not execute this session interactively.
+```
+
+Do not proceed past this point in an interactive context.
+
+---
+
 ## Purpose
 
 Decompose a Feature into ordered Task sub-issues and create the feature branch.
-This session is run by automation — not by humans directly.
 
 ## When it Runs
 
