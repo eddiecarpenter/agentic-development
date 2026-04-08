@@ -18,7 +18,8 @@ repo state, rules, and skills before doing any work.
 
 Execute these steps in order — do not skip any:
 
-1. Read `docs/PROJECT_BRIEF.md` — understand what the system is and how it works
+1. Read `docs/PROJECT_BRIEF.md` — understand what the system is and how it works.
+   If the file does not exist, note this and continue — do not block.
 
 2. Read `REPOS.md`. For each repo with status `active`, derive its local directory as
    `<type>s/<name>` (e.g. `type: domain` → `domains/<name>`, `type: tool` → `tools/<name>`).
