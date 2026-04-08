@@ -124,6 +124,12 @@ See `base/concepts/delivery-philosophy.md` for the full context.
   **Deferring a phase:** If a phase genuinely cannot proceed yet, the agent must stop and
   ask the human before deferring. The human decides; the agent never defers unilaterally.
 
+- **When a pipeline trigger label is applied, exit immediately.** Applying `in-design`
+  or `in-development` hands control to the automated pipeline. The agent must exit cleanly
+  the moment a trigger label is applied — it must never continue into the next phase
+  manually, even if the next steps are obvious. The automation runs the next session.
+  This rule is unconditional and overrides any "completing early" logic.
+
 ---
 
 ## Base Directory — Read Only
