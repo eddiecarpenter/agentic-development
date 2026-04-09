@@ -105,3 +105,6 @@ Execute these steps in order — do not skip any:
 - If `TEMPLATE_VERSION` is missing or unreadable, warn the human and continue —
   the version file is informational, not blocking
 - There is no STATUS.md — current state is derived from GitHub Issues
+- **Inline status updates**: this skill does not apply pipeline labels. If a future
+  change adds a pipeline label transition here, it must include an inline project status
+  update following `set-issue-status.md` — hard-fail if `AGENTIC_PROJECT_ID` is not set
