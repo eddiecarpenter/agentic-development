@@ -1,5 +1,22 @@
 # PR Review Session — Stage 4b
 
+## ⛔ Automation-Only — Do Not Execute Interactively
+
+This session is triggered exclusively by GitHub Actions when a PR review is submitted.
+It must never be run manually by an agent in an interactive session.
+
+If you are reading this skill in an interactive session, stop immediately and print:
+
+```
+REFUSED: PR Review Session is automation-only.
+It runs automatically when a PR review is submitted.
+Do not execute this session interactively.
+```
+
+Do not proceed past this point in an interactive context.
+
+---
+
 ## Purpose
 
 Process review comments left on a PR by a human reviewer.
