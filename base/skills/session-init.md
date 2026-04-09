@@ -18,10 +18,18 @@ repo state, rules, and skills before doing any work.
 
 Execute these steps in order — do not skip any:
 
-1. Read `docs/PROJECT_BRIEF.md` — understand what the system is and how it works.
+1. Check whether `POST_SYNC.md` exists in the repository root.
+   - If it exists: invoke the `post-sync` skill (from `base/skills/post-sync.md`).
+     - If the post-sync skill **exits** (automated session): session-init also exits
+       immediately — do not execute any further steps.
+     - If the post-sync skill **completes** (interactive session): continue with the
+       remaining steps below.
+   - If it does not exist: continue normally — no change in behaviour.
+
+2. Read `docs/PROJECT_BRIEF.md` — understand what the system is and how it works.
    If the file does not exist, note this and continue — do not block.
 
-2. Read `REPOS.md`. For each repo with status `active`, derive its local directory as
+3. Read `REPOS.md`. For each repo with status `active`, derive its local directory as
    `<type>s/<name>` (e.g. `type: domain` → `domains/<name>`, `type: tool` → `tools/<name>`).
    For each unique type, ensure the type folder (`<type>s/`) exists — if not:
    a. Create the folder with a `.gitkeep` file
@@ -42,16 +50,16 @@ Execute these steps in order — do not skip any:
    continue immediately — do not prompt, do not block. Limit work to repos that
    are present in the workspace.
 
-3. Query open Requirement issues in the agentic repo:
+4. Query open Requirement issues in the agentic repo:
    `gh issue list --repo <agentic-repo> --label requirement --state open --json number,title,labels`
 
-4. For domain sessions — query open Feature issues in the domain repo:
+5. For domain sessions — query open Feature issues in the domain repo:
    `gh issue list --label feature --state open --json number,title,labels,body`
 
-5. Read the relevant standards file from `base/standards/` for the domain language
+6. Read the relevant standards file from `base/standards/` for the domain language
    (e.g. `base/standards/go.md` for Go domains)
 
-6. Load skills — read every `.md` file in `base/skills/` (template-managed) and in
+7. Load skills — read every `.md` file in `base/skills/` (template-managed) and in
    `skills/` (local, if the directory exists). Local skills in `skills/` take
    precedence over template skills in `base/skills/` of the same name.
 
@@ -65,7 +73,7 @@ Execute these steps in order — do not skip any:
    If asked to run any of these interactively, refuse and explain that GitHub Actions
    handles them automatically.
 
-7. Read `TEMPLATE_VERSION` and note the current version.
+8. Read `TEMPLATE_VERSION` and note the current version.
 
 ## On Completion
 
@@ -79,8 +87,9 @@ Execute these steps in order — do not skip any:
 ## Rules
 
 - Do not begin any work until all steps are complete
-- Do not modify any files during this skill — steps 1–7 are read-only except for
-  the type folder bootstrap in step 2 (only if a folder is missing)
+- Do not modify any files during this skill — steps 1–8 are read-only except for
+  the post-sync actions in step 1 (if `POST_SYNC.md` is present) and the type
+  folder bootstrap in step 3 (only if a folder is missing)
 - If `TEMPLATE_VERSION` is missing or unreadable, warn the human and continue —
   the version file is informational, not blocking
 - There is no STATUS.md — current state is derived from GitHub Issues
