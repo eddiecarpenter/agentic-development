@@ -32,7 +32,10 @@ The full requirement label lifecycle: **Backlog → Scoping → Scheduled → Do
 2. Lists available requirements in `backlog` state
 3. Waits for the human to select a requirement
 4. Transitions the requirement from `backlog` to `scoping`
-5. Works through seven artefacts to define the feature:
+5. Works through seven artefacts to define the feature.
+   **Present each artefact to the human and wait for explicit confirmation before
+   proceeding to the next.** Do not batch artefacts or produce the next one until
+   the human has approved or revised the current one.
    - Raw idea summary
    - Problem statement
    - Feature definition — includes a user story statement in `As a [user], I want [goal], so that [benefit]` format
@@ -48,7 +51,7 @@ The full requirement label lifecycle: **Backlog → Scoping → Scheduled → Do
      with ordered tasks and explain the cost of splitting. Only recommend parallel features
      when the work is substantial enough that parallelism delivers real value. Record the
      recommendation and reasoning in the scoping summary.
-   - Acceptance criteria (checkboxes, outcome-based)
+   - Acceptance criteria — use Given/When/Then format for every criterion (not checkboxes, not prose). Minimum three criteria: one success case, one failure case, and at least one edge case.
    - UX design (if applicable)
    - **Deployment strategy** — ask: *"How should this feature reach users once deployed?"*
      Present the options and confirm the type:
@@ -74,7 +77,7 @@ The full requirement label lifecycle: **Backlog → Scoping → Scheduled → Do
 9. Wires sub-issue relationship: Feature → parent Requirement
 10. **Explicit trigger confirmation** — presents the full list of agreed features and asks:
     *"Which of these features should be triggered for design now? (list numbers, or 'all')"*
-    - Apply `in-design` only to features the human explicitly selects
+    - Apply `in-design` only to features the human explicitly selects — and remove the `backlog` label in the same operation. A feature carries one status label at a time.
     - Features not selected remain at `backlog` with a note in the issue body:
       `> Not triggered during scoping — awaiting human decision.`
     - For features held due to cross-repo dependencies, leave at `backlog` and document
