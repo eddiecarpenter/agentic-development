@@ -30,15 +30,60 @@ Triggered automatically by GitHub Actions when a Feature issue is labelled `in-d
 1. Verifies it is on the correct feature branch — never works on main
 2. Reads the Feature issue and extracts acceptance criteria for end-of-session verification
 3. Queries open Task sub-issues on the Feature, ordered by issue number
-4. For each Task in order:
+4. If `recovery.md` does not exist at session start, proceed as a fresh start — no
+   recovery behaviour occurs
+5. For each Task in order:
    - Reads the task issue and understands what must be built
    - Implements the work described
    - Builds and tests — stops immediately on failure and reports the exact error
    - Commits: `feat: [task description] — task N of N (#feature-issue)`
    - Closes the task issue
-5. Verifies each acceptance criterion has test coverage — stops if any criterion is uncovered
-6. When all tasks are closed and criteria verified — prints: `=== Dev Session — Completed ===`
-7. Exits cleanly — the workflow pushes and opens the PR automatically
+   - **Writes `recovery.md`** — after the commit and close, write `recovery.md` to
+     the repo root with the current progress state (see format below), then:
+     ```bash
+     git add recovery.md
+     git commit -m "chore: update recovery.md — task N of N (#feature-issue)"
+     git push
+     ```
+     This must happen *after* each successful task commit and *before* starting the
+     next task. It ensures that if the session dies, the next session can resume from
+     the recorded state.
+6. Verifies each acceptance criterion has test coverage — stops if any criterion is uncovered
+7. When all tasks are closed and criteria verified — prints: `=== Dev Session — Completed ===`
+8. Exits cleanly — the workflow pushes and opens the PR automatically
+
+## recovery.md Format
+
+After each task commit, write `recovery.md` to the repo root with exactly this structure:
+
+```markdown
+# Recovery State
+
+| Field               | Value                              |
+|---------------------|------------------------------------|
+| Feature issue       | #<feature-issue-number>            |
+| Branch              | <current-branch-name>              |
+| Total tasks         | <total-task-count>                 |
+| Last updated        | <ISO 8601 timestamp>               |
+
+## Completed Tasks
+
+- [x] #<issue-number> — <task-title>
+- [x] #<issue-number> — <task-title>
+
+## Remaining Tasks
+
+- [ ] #<issue-number> — <task-title> ← current
+- [ ] #<issue-number> — <task-title>
+```
+
+**Field definitions:**
+- **Feature issue** — the parent Feature issue number (e.g. `#197`)
+- **Branch** — the current branch name from `git branch --show-current`
+- **Total tasks** — the total number of Task sub-issues at session start
+- **Last updated** — ISO 8601 timestamp (`date -u +%Y-%m-%dT%H:%M:%SZ`)
+- **Completed Tasks** — each task committed and closed so far, in order
+- **Remaining Tasks** — each task not yet completed; mark the next task with `← current`
 
 ## Rules
 
