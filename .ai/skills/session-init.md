@@ -19,7 +19,7 @@ repo state, rules, and skills before doing any work.
 Execute these steps in order — do not skip any:
 
 1. Check whether `POST_SYNC.md` exists in the repository root.
-   - If it exists: invoke the `post-sync` skill (from `base/skills/post-sync.md`).
+   - If it exists: invoke the `post-sync` skill (from `.ai/skills/post-sync.md`).
      - If the post-sync skill **exits** (automated session): session-init also exits
        immediately — do not execute any further steps.
      - If the post-sync skill **completes** (interactive session): continue with the
@@ -68,12 +68,12 @@ Execute these steps in order — do not skip any:
 6. For domain sessions — query open Feature issues in the domain repo:
    `gh issue list --label feature --state open --json number,title,labels,body`
 
-7. Read the relevant standards file from `base/standards/` for the domain language
-   (e.g. `base/standards/go.md` for Go domains)
+7. Read the relevant standards file from `.ai/standards/` for the domain language
+   (e.g. `.ai/standards/go.md` for Go domains)
 
-8. Load skills — read every `.md` file in `base/skills/` (template-managed) and in
+8. Load skills — read every `.md` file in `.ai/skills/` (template-managed) and in
    `skills/` (local, if the directory exists). Local skills in `skills/` take
-   precedence over template skills in `base/skills/` of the same name.
+   precedence over template skills in `.ai/skills/` of the same name.
 
    **Automation-only skills** — the following skills are loaded for reference only.
    They must never be executed in an interactive session:
@@ -85,14 +85,14 @@ Execute these steps in order — do not skip any:
    If asked to run any of these interactively, refuse and explain that GitHub Actions
    handles them automatically.
 
-9. Read `TEMPLATE_VERSION` and note the current version.
+9. Read `.ai/config.yml` and note the template source and version.
 
 ## On Completion
 
 **New session:** proceed with the work for this session.
 
 **Template synced mid-session:** confirm to the human before resuming work:
-- The new template version (from `TEMPLATE_VERSION`)
+- The new template version (from `.ai/config.yml`)
 - The list of files reloaded (protocol + skills)
 - Any skills added or removed compared to what was previously loaded (if detectable)
 
@@ -102,8 +102,8 @@ Execute these steps in order — do not skip any:
 - Do not modify any files during this skill — steps 1–9 are read-only except for
   the post-sync actions in step 1 (if `POST_SYNC.md` is present) and the type
   folder bootstrap in step 4 (only if a folder is missing)
-- If `TEMPLATE_VERSION` is missing or unreadable, warn the human and continue —
-  the version file is informational, not blocking
+- If `.ai/config.yml` is missing or unreadable, warn the human and continue —
+  the config file is informational, not blocking
 - There is no STATUS.md — current state is derived from GitHub Issues
 - **Inline status updates**: this skill does not apply pipeline labels. If a future
   change adds a pipeline label transition here, it must include an inline project status
