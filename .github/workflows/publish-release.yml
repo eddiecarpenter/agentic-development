@@ -52,10 +52,12 @@ jobs:
       - name: Create GitHub release
         # Skip if this run was triggered by the tag force-push from the version bump step
         if: steps.version.outputs.committed != 'true'
+        env:
+          GOOSE_AGENT_PAT: ${{ secrets.GOOSE_AGENT_PAT }}
         run: |
           # Check if release already exists — skip gracefully if so (avoids duplicate on re-tag)
           STATUS=$(curl -s -o /dev/null -w "%{http_code}" \
-            -H "Authorization: token ${{ secrets.GOOSE_AGENT_PAT }}" \
+            -H "Authorization: token ${GOOSE_AGENT_PAT}" \
             -H "Accept: application/vnd.github+json" \
             "https://api.github.com/repos/${{ github.repository }}/releases/tags/${{ github.ref_name }}")
           if [ "${STATUS}" = "200" ]; then
@@ -63,7 +65,7 @@ jobs:
             exit 0
           fi
           curl -sf -X POST \
-            -H "Authorization: token ${{ secrets.GOOSE_AGENT_PAT }}" \
+            -H "Authorization: token ${GOOSE_AGENT_PAT}" \
             -H "Accept: application/vnd.github+json" \
             "https://api.github.com/repos/${{ github.repository }}/releases" \
             -d "{\"tag_name\": \"${{ github.ref_name }}\", \"name\": \"Release ${{ github.ref_name }}\", \"body\": \"Generating release notes\u2026\"}"
