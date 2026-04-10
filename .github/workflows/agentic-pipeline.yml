@@ -55,9 +55,11 @@ jobs:
         uses: ./.github/actions/install-ai-tools
 
       - name: Restore Claude Code auth
+        env:
+          CLAUDE_CREDENTIALS_JSON: ${{ secrets.CLAUDE_CREDENTIALS_JSON }}
         run: |
           mkdir -p ~/.claude
-          echo "${{ secrets.CLAUDE_CREDENTIALS_JSON }}" | base64 -d > ~/.claude/.credentials.json
+          echo "${CLAUDE_CREDENTIALS_JSON}" | base64 -d > ~/.claude/.credentials.json
           chmod 0600 ~/.claude/.credentials.json
 
 
@@ -174,9 +176,11 @@ jobs:
           install-gh-cli: 'false'
 
       - name: Restore Claude Code auth
+        env:
+          CLAUDE_CREDENTIALS_JSON: ${{ secrets.CLAUDE_CREDENTIALS_JSON }}
         run: |
           mkdir -p ~/.claude
-          echo "${{ secrets.CLAUDE_CREDENTIALS_JSON }}" | base64 -d > ~/.claude/.credentials.json
+          echo "${CLAUDE_CREDENTIALS_JSON}" | base64 -d > ~/.claude/.credentials.json
           chmod 0600 ~/.claude/.credentials.json
 
 
@@ -395,9 +399,11 @@ jobs:
         uses: ./.github/actions/install-ai-tools
 
       - name: Restore Claude Code auth
+        env:
+          CLAUDE_CREDENTIALS_JSON: ${{ secrets.CLAUDE_CREDENTIALS_JSON }}
         run: |
           mkdir -p ~/.claude
-          echo "${{ secrets.CLAUDE_CREDENTIALS_JSON }}" | base64 -d > ~/.claude/.credentials.json
+          echo "${CLAUDE_CREDENTIALS_JSON}" | base64 -d > ~/.claude/.credentials.json
           chmod 0600 ~/.claude/.credentials.json
 
 
@@ -507,9 +513,11 @@ jobs:
         uses: ./.github/actions/install-ai-tools
 
       - name: Restore Claude Code auth
+        env:
+          CLAUDE_CREDENTIALS_JSON: ${{ secrets.CLAUDE_CREDENTIALS_JSON }}
         run: |
           mkdir -p ~/.claude
-          echo "${{ secrets.CLAUDE_CREDENTIALS_JSON }}" | base64 -d > ~/.claude/.credentials.json
+          echo "${CLAUDE_CREDENTIALS_JSON}" | base64 -d > ~/.claude/.credentials.json
           chmod 0600 ~/.claude/.credentials.json
 
 

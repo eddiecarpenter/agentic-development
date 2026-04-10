@@ -52,9 +52,11 @@ jobs:
           npm install -g @anthropic-ai/claude-code
 
       - name: Restore Claude Code auth
+        env:
+          CLAUDE_CREDENTIALS_JSON: ${{ secrets.CLAUDE_CREDENTIALS_JSON }}
         run: |
           mkdir -p ~/.claude
-          echo "${{ secrets.CLAUDE_CREDENTIALS_JSON }}" | base64 -d > ~/.claude/.credentials.json
+          echo "${CLAUDE_CREDENTIALS_JSON}" | base64 -d > ~/.claude/.credentials.json
           chmod 0600 ~/.claude/.credentials.json
 
       - name: Validate and refresh Claude Code credentials
@@ -111,9 +113,11 @@ jobs:
           GH_TOKEN: ${{ secrets.GOOSE_AGENT_PAT }}
 
       - name: Verify release notes were updated
+        env:
+          GOOSE_AGENT_PAT: ${{ secrets.GOOSE_AGENT_PAT }}
         run: |
           BODY=$(curl -sf \
-            -H "Authorization: token ${{ secrets.GOOSE_AGENT_PAT }}" \
+            -H "Authorization: token ${GOOSE_AGENT_PAT}" \
             -H "Accept: application/vnd.github+json" \
             "https://api.github.com/repos/${{ github.repository }}/releases/tags/${{ github.event.release.tag_name }}" \
             | jq -r '.body')
