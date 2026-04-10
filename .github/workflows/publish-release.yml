@@ -30,6 +30,7 @@ jobs:
           token: ${{ secrets.GOOSE_AGENT_PAT }}
 
       - name: Update version in .ai/config.yml
+        id: version
         run: |
           sed -i "s/^version:.*/version: ${{ github.ref_name }}/" .ai/config.yml
           git config user.name  "github-actions[bot]"
@@ -37,6 +38,7 @@ jobs:
           git add .ai/config.yml
           if git diff --cached --quiet; then
             echo "version already up to date — skipping commit"
+            echo "committed=false" >> $GITHUB_OUTPUT
           else
             git commit -m "chore: update version to ${{ github.ref_name }}"
             git push origin main
@@ -44,10 +46,22 @@ jobs:
             git tag -f ${{ github.ref_name }}
             git push origin -f refs/tags/${{ github.ref_name }}
             echo "Tag ${{ github.ref_name }} moved to version-bump commit"
+            echo "committed=true" >> $GITHUB_OUTPUT
           fi
 
       - name: Create GitHub release
+        # Skip if this run was triggered by the tag force-push from the version bump step
+        if: steps.version.outputs.committed != 'true'
         run: |
+          # Check if release already exists — skip gracefully if so (avoids duplicate on re-tag)
+          STATUS=$(curl -s -o /dev/null -w "%{http_code}" \
+            -H "Authorization: token ${{ secrets.GOOSE_AGENT_PAT }}" \
+            -H "Accept: application/vnd.github+json" \
+            "https://api.github.com/repos/${{ github.repository }}/releases/tags/${{ github.ref_name }}")
+          if [ "${STATUS}" = "200" ]; then
+            echo "Release ${{ github.ref_name }} already exists — skipping"
+            exit 0
+          fi
           curl -sf -X POST \
             -H "Authorization: token ${{ secrets.GOOSE_AGENT_PAT }}" \
             -H "Accept: application/vnd.github+json" \
