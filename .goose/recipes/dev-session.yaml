@@ -136,6 +136,7 @@ instructions: |
     git add recovery.md
     git commit -m "chore: update recovery.md — task N of N (#{{ feature_issue }})"
     git push
+    echo "=== Checkpoint saved — task N of N complete, recovery.md pushed ==="
 
   This must happen before starting the next task. It ensures the session can be
   resumed if the runner dies.
