@@ -72,8 +72,12 @@ instructions: |
     ## Chores
     - <Infrastructure, dependency updates, tooling — only if notable>
 
+    ## Downstream Actions
+    - <Each required post-sync step, listed explicitly and clearly>
+    - Or: "No downstream actions required for this release"
+
   Rules:
-  - Omit any section that has no entries
+  - Omit any section that has no entries — except Downstream Actions, which is always present
   - Do not include the release tag or a title — GitHub adds the title separately
   - Each bullet is one sentence, present tense: "Adds...", "Fixes...", "Removes..."
   - Name the thing that changed, not the mechanism
@@ -91,9 +95,14 @@ instructions: |
   - Minor CI or tooling changes with no user impact
   - Commits that duplicate another commit in the same release
 
-  For framework releases specifically:
-  Flag any changes that require downstream action — new required secrets, changed
-  AGENTS.md rules, renamed or new skills, breaking changes to recipe parameters.
+  Downstream Actions section:
+  - Review commits and changed files for anything requiring downstream action:
+    new required secrets, new repo variables, config file changes, renamed or new
+    skills, breaking changes to recipe parameters
+  - If action is required: list each step explicitly and clearly in the
+    ## Downstream Actions section
+  - If no action is required: write "No downstream actions required for this release"
+  - This section is mandatory — it is always present, never omitted
 
   Write the release notes to /tmp/release-notes.md.
 
