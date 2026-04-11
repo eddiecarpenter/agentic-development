@@ -134,42 +134,18 @@ jobs:
       pull-requests: write
 
     steps:
-      - name: Resolve gh CLI version
-        id: gh-pre-version
-        run: |
-          GH_VERSION=$(curl --proto '=https' --tlsv1.2 -fsSL https://api.github.com/repos/cli/cli/releases/latest | grep '"tag_name"' | sed 's/.*"v\([^"]*\)".*/\1/')
-          echo "version=${GH_VERSION}" >> $GITHUB_OUTPUT
-
-      - name: Cache gh CLI
-        id: cache-gh-pre
-        uses: actions/cache@5a3ec84eff668545956fd18022155c47e93e2684  # v4.2.3
-        with:
-          path: ~/.local/bin/gh
-          key: gh-cli-${{ steps.gh-pre-version.outputs.version }}
-
-      - name: Install gh CLI
-        if: steps.cache-gh-pre.outputs.cache-hit != 'true'
-        env:
-          GH_VERSION: ${{ steps.gh-pre-version.outputs.version }}
-        run: |
-          mkdir -p ~/.local/bin
-          curl --proto '=https' --tlsv1.2 -fsSL "https://github.com/cli/cli/releases/download/v${GH_VERSION}/gh_${GH_VERSION}_linux_amd64.tar.gz" -o /tmp/gh.tar.gz
-          tar -xz -C /tmp -f /tmp/gh.tar.gz
-          mv /tmp/gh_${GH_VERSION}_linux_amd64/bin/gh ~/.local/bin/gh
-
-      - name: Add gh CLI to PATH
-        run: |
-          mkdir -p ~/.local/bin
-          echo "$HOME/.local/bin" >> $GITHUB_PATH
-
       - name: Resolve feature branch
         id: branch
         env:
           GH_TOKEN: ${{ secrets.GOOSE_AGENT_PAT }}
+          ISSUE: ${{ github.event.issue.number }}
+          REPO: ${{ github.repository }}
         run: |
-          ISSUE=${{ github.event.issue.number }}
-          BRANCH=$(gh api repos/${{ github.repository }}/branches \
-            --jq ".[] | .name | select(startswith(\"feature/${ISSUE}-\"))" \
+          BRANCH=$(curl --proto '=https' --tlsv1.2 -fsSL \
+            -H "Authorization: token ${GH_TOKEN}" \
+            -H "Accept: application/vnd.github+json" \
+            "https://api.github.com/repos/${REPO}/branches?per_page=100" \
+            | jq -r ".[].name | select(startswith(\"feature/${ISSUE}-\"))" \
             | head -1)
           if [ -z "$BRANCH" ]; then
             echo "No branch found matching feature/${ISSUE}-*"
@@ -191,8 +167,6 @@ jobs:
 
       - name: Install Goose and Claude Code CLI
         uses: ./.github/actions/install-ai-tools
-        with:
-          install-gh-cli: 'false'
 
       - name: Restore Claude Code auth
         env:

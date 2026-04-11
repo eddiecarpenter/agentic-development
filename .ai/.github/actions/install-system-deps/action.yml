@@ -1,0 +1,41 @@
+name: Install System Dependencies
+description: >
+  Install system packages (gh, bzip2, libgomp1) with apt cache support.
+  Skips all steps if packages are already present (e.g. on GitHub-hosted runners).
+
+runs:
+  using: composite
+  steps:
+    - name: Check if packages already installed
+      id: check
+      shell: bash
+      run: |
+        dpkg -s gh bzip2 libgomp1 >/dev/null 2>&1 \
+          && echo "installed=true" >> $GITHUB_OUTPUT \
+          || echo "installed=false" >> $GITHUB_OUTPUT
+
+    - name: Resolve package versions for cache key
+      id: pkg-versions
+      if: steps.check.outputs.installed != 'true'
+      shell: bash
+      run: |
+        # Use apt-cache show without updating lists — fast, works on stale lists
+        GH_VER=$(apt-cache show gh 2>/dev/null | grep '^Version:' | head -1 | awk '{print $2}' || echo "latest")
+        BZIP2_VER=$(apt-cache show bzip2 2>/dev/null | grep '^Version:' | head -1 | awk '{print $2}' || echo "latest")
+        LIBGOMP_VER=$(apt-cache show libgomp1 2>/dev/null | grep '^Version:' | head -1 | awk '{print $2}' || echo "latest")
+        echo "key=apt-sys-deps-${{ runner.os }}-${{ runner.arch }}-gh${GH_VER}-bzip2${BZIP2_VER}-gomp${LIBGOMP_VER}" >> $GITHUB_OUTPUT
+
+    - name: Cache apt archives
+      if: steps.check.outputs.installed != 'true'
+      id: cache-apt
+      uses: actions/cache@5a3ec84eff668545956fd18022155c47e93e2684  # v4.2.3
+      with:
+        path: /var/cache/apt/archives
+        key: ${{ steps.pkg-versions.outputs.key }}
+
+    - name: Install packages
+      if: steps.check.outputs.installed != 'true'
+      shell: bash
+      run: |
+        sudo apt-get update -qq
+        sudo apt-get install -y --no-install-recommends gh bzip2 libgomp1
