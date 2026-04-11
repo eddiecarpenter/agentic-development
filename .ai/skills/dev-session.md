@@ -46,7 +46,15 @@ Triggered automatically by GitHub Actions when a Feature issue is labelled `in-d
        - Skip those tasks in step 5 — resume from the first incomplete task
 5. For each Task in order (skipping tasks completed in recovery mode):
    - Reads the task issue and understands what must be built
-   - Implements the work described
+   - Implements the work described — after each significant step (file created,
+     function complete, tests written), writes an intra-task checkpoint to `recovery.md`
+     with a `## Current Task` section and pushes immediately:
+     ```bash
+     git add recovery.md
+     git commit -m "chore: recovery checkpoint — <brief description> (#feature-issue)"
+     git push
+     echo "=== Intra-task checkpoint pushed ==="
+     ```
    - Builds and tests — stops immediately on failure and reports the exact error
    - Commits: `feat: [task description] — task N of N (#feature-issue)`
    - Closes the task issue
@@ -112,7 +120,24 @@ After each task commit, write `recovery.md` to the repo root with exactly this s
 - **Total tasks** — the total number of Task sub-issues at session start
 - **Last updated** — ISO 8601 timestamp (`date -u +%Y-%m-%dT%H:%M:%SZ`)
 - **Completed Tasks** — each task as a subsection with implementation summary, files changed, and decisions
+- **Current Task** — present during task execution only; updated after each significant implementation step with status, last step, next step, and any notes for a recovering session
 - **Remaining Tasks** — each task not yet completed; mark the next task with `← current`
+
+### Current Task format (intra-task checkpoints)
+
+During task implementation, replace or add the `## Current Task` section:
+
+```markdown
+## Current Task
+
+### #<issue-number> — <task-title>
+- **Status:** in-progress
+- **Last step:** <what was just completed, e.g. "created X.go", "wrote tests for Y">
+- **Next step:** <what comes next>
+- **Notes:** <anything a recovering session needs to know, or "None">
+```
+
+Remove the `## Current Task` section when writing the post-task checkpoint (task complete).
 
 ## Rules
 
