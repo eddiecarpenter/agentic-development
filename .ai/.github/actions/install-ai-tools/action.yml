@@ -23,7 +23,9 @@ runs:
     - name: Install system dependencies
       shell: bash
       run: |
-        sudo apt-get update -qq && sudo apt-get install -y bzip2 libgomp1
+        # Skip apt-get if packages are already installed (pre-installed on ubuntu-latest)
+        dpkg -s bzip2 libgomp1 >/dev/null 2>&1 || \
+          (sudo apt-get update -qq && sudo apt-get install -y bzip2 libgomp1)
 
     - name: Resolve Goose version
       id: goose-version
